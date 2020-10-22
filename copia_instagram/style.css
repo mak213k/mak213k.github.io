@@ -1,0 +1,134 @@
+*{
+	
+	/*padding: 4px;*/
+    margin: 2px;
+    box-sizing: border-box;
+    text-decoration: none;
+    font-family: sans-serif;
+    font-size: 14px;	
+}
+
+body{
+	
+	display:flex;
+	width:100%;
+	min-height:100vh;
+	background-color:rgb(243,243,243);
+	margin:0;
+	padding:0;
+	
+}
+
+body > div > div.instagram-continue > div{
+	
+	text-align: center;
+}
+
+.instagram-continue{
+	
+	display:flex;
+	align-items:center;
+	justify-content:static;
+	width:60%;
+	float: right;
+    clear: both;
+	margin-right: -20em;
+    margin-top: -66em;
+	border: groove;
+    border-width: thin;
+	background-color: white;
+	margin-right: -25em;
+    padding-right: 25em;
+	float: right;
+	/*flex-direction: column;*/
+	
+}
+
+body > div > div.instagram-continue > div > div.profile-photo{
+	
+	text-align: -webkit-center;
+}
+
+#troca_perfil{
+	
+	background-color: #0095f6;;
+	color: white;
+	white-space: nowrap;
+	font-weight: 600;
+	margin-left: 0em;
+    margin-right: 0em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+	font-size: 14px;
+}
+
+.instagram-login{
+	
+	
+}
+
+body > div > div.instagram-continue > div > div.profile-photo > img{
+	
+	border-radius: 100px;
+    border: solid 1px #efefef;
+    height: 100px;
+    width: 100px;
+}
+
+.img_interna{
+	
+	padding: 0em;
+    margin: 0em;
+    transform: translate(150px, -38em);
+    
+}
+
+body > div > div.instagram-continue > div > a{
+	
+	/*font-size: 0.89em;*/
+}
+
+.instagram-logo{
+	
+	background: url(img/logo_and_icons.png);
+    background-repeat: no-repeat;
+    background-position: -179px -331px;
+    height: 3em;
+    background-size: 45em;
+    width: 11em;
+	margin: 22px auto 12px;
+}
+
+.instagram-phone{
+	
+	display:flex;
+}
+
+
+@media (max-width: 1024px) 
+{
+	.instagram-wrapper
+	{
+	width: 90%;
+	}
+}
+
+@media(max-width: 650px){
+	
+	.instagram-wrapper{
+		width:90%;
+	}
+	.instagram-phone{
+		
+		display:none;
+	}
+	.instagram-continue{
+		
+		display: flex;
+		width: 68%;
+		margin-top: -25em;
+		margin-right: auto;
+}
+	}
+	
+}
