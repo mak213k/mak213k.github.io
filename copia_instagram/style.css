@@ -124,11 +124,11 @@ body > div > div.instagram-continue > div > a{
 	}
 	.instagram-continue{
 		
-		display: flex;
+		display: center;
 		width: 68%;
 		margin-top: -25em;
 		margin-right: auto;
-}
+		position: absolute;
+		
 	}
-	
 }
