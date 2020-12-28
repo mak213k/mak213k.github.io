@@ -10,18 +10,88 @@
 	</title>
 </head>
 <body>
-	<div>
 	<header>
-		<div class="container">
-			<h2>NETFLIX</h2>
+		<div class="container" style="background-size: 100%; background-position: center;">
+			<div class="logo"><h2 id="logo">NETFLIX</h2></div>
+			<!--
 			<nav>
 				<a href="#">Início</a>
 				<a href="#">Séries</a>
 				<a href="#">Filmes</a>
 				<a href="#">Documentário</a>
+				
 			</nav>
-		<div>
-	<header>
-	<footer></footer>
+			-->
+			
+			<button class="login"><h2 id="login"><a href="https://www.netflix.com/br/login">Entrar</a></h2></button>
+		</div>
+	</header>
+	<main>
+	
+		<div class="body_assinatura">
+			<h1 id="titulo">Filmes, séries e muito mais. Sem limites.</h1><br>
+			<h2 id="subtitulo">Assista onde quiser. Cancele quando quiser.</h2><br>
+			<div id="assinatura">Pronto para assistir? Informe seu email para criar ou reiniciar sua assinatura.</div><br>
+			<input id="email" type="text" maxlength="50" minlength="5" />
+			<button id="submeter_email">Vamos lá</button>
+		</div>
+		
+		<div class="tv">
+			<div class="tv_section">
+			<h1>
+				Aproveite na TV.
+			</h1>
+			<h2>
+				Assista em Smart TVs, PlayStation, Xbox, Chromecast, Apple TV, aparelhos de Blu-ray e outros dispositivos.
+			</h2>
+			</div>
+			
+			<div class="div_figure">
+				<img class="tv_figure" id="tv_figure" src="img/tv.png" >
+			</div>
+			
+			<div class="div_movie" style="">
+				<video id="tv_movie" >
+					<source src="img/video-tv-0819.m4v">
+				</video>
+			</div>
+		</div>
+		
+		<div class="mobile" >
+			<img class="mobile_figure" src="img/mobile.jpg" />
+			<div class="mobile_section">
+			<h1>
+				Aproveite na TV.
+			</h1>
+			<h2>
+				Assista em Smart TVs, PlayStation, Xbox, Chromecast, Apple TV, aparelhos de Blu-ray e outros dispositivos.
+			</h2>
+			</div>
+		</div>
+	</main>
+	<footer>
+	
+		<div class="screen">
+			<div class="screen_section">
+			<h1>
+				Assista quando quiser.
+			</h1>
+			<h2>
+				Assista no celular, tablet, Smart TV ou notebook sem pagar a mais por isso.
+			</h2>
+			</div>
+			
+			<div class="div_screen">
+				<img class="tv_screen" id="tv_screen" src="img/screen.png" >
+			</div>
+			
+			<div class="div_screen" style="">
+				<video id="screen_movie" >
+					<source src="img/video-devices.m4v">
+				</video>
+			</div>
+		</div>
+	
+	</footer>
 </body>
 </html>

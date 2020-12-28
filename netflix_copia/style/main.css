@@ -1,4 +1,201 @@
+
 body{
+	/*
+	background-image: url('../img/fundo.jpg');
 	
-	background-color:blue;
+	width: 100%;
+    height: 40%;
+    opacity : 0.6;
+	*/
+	background-color:black;
+	color:white;
 }
+
+#logo{
+	
+	background-image: url('../img/logo.png');
+	/*
+	width: 100%;
+    height: 40%;
+	*/
+	color:red;
+	padding-top:0.6rem;
+	padding-left:0.3em;
+	padding-right: 0.8em;
+	margin:0em;
+	display: flex;
+	font-family:"Netflix Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 3.125rem;
+}
+
+h1#titulo {
+    font-size: 3.125rem;
+}
+
+h2#subtitulo{
+	
+	font-size: 1.625rem;
+}
+
+#email, #submeter_email{
+	
+	height: 3rem;
+}
+
+#email{
+	width: 28.125rem;
+}
+
+#submeter_email{
+	
+	width: 6.5rem;
+	font-size: 1.2rem;
+	background-color: red;
+    color: white;
+	border: solid red;
+}
+
+.login{
+	
+	font-size: 0.65rem;
+	background-color: red;
+    color: white;
+	padding-top:0.6rem;
+	padding-right:0.3rem;
+	padding-left:0.3rem;
+	padding-right:0.3rem;
+	margin: 1.4rem;
+	border-radius:0.4rem;
+	border: solid red;
+}
+
+#logo,h2#subtitulo,#email, #submeter_email{
+	
+	z-index: 1;
+}
+
+/*
+:root{
+	
+	--vermelho;
+	--preta: #141414;
+}
+*/
+
+nav {
+    padding-right: 6em;
+}
+
+*{
+	
+	margin:0;
+	padding:0;
+	box-sizing: border-box;
+	font-family:"Netflix Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	align-itens:center;
+	text-align: center;
+}
+
+.body_assinatura{
+	
+	padding:6em;
+	margin:2em;
+	border-bottom: 8px solid #222;
+	background: url(../img/fundo.jpg);
+	
+}
+
+
+header .container{
+	padding-top:0.8em;
+	display: flex;
+	align-itens:center;
+	flex-direction:row;
+	justify-content:space-between;
+}
+
+.tv_section, .tv_screen, .screen_section{
+	
+	width: 100%;
+}
+
+.tv, .screen{
+	
+	    display: inline-flex;
+		border-bottom: 8px solid #222;
+		padding:5rem;
+		justify-content:space-between;
+		text-align: center;
+		display: flex;
+		align-items: center
+}
+
+.tv text, .screen text{
+	
+	padding-top: 5rem;
+}
+
+/*
+img.tv_figure {
+    background-image: url(img/video-tv-0819.m4v);
+}
+**/
+
+#screen_movie{
+	
+	z-index:3;
+	height: 14rem;
+
+}
+
+#tv_movie{
+	
+	width: 31rem;
+    left: 15rem;
+}
+
+#tv_figure{
+	
+	z-index:1;
+	position: relative;
+	left: 35em;
+}
+
+#tv_screen{
+	
+	z-index: 1;
+    position: relative;
+    left: 31em;
+    width: 38em;
+    top: 5em;
+    height: 31rem;
+}
+
+a:link, a:visited, a:hover, a:active{
+	
+	text-decoration:none;
+	color:white;
+}
+
+
+.div_figure, .div_movie{
+	
+}
+
+.mobile{
+	
+	display: inline-flex;
+		
+	padding:3rem;
+	justify-content:space-between;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	border-bottom: 8px solid #222;
+}
+
+.mobile_figure, .mobile_section{
+	
+	width:50%;
+}
+
