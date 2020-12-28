@@ -98,11 +98,10 @@ nav {
 
 .body_assinatura{
 	
-	padding:6em;
-	margin:2em;
-	border-bottom: 8px solid #222;
-	background: url(../img/fundo.jpg);
-	
+	padding-top: 24rem;
+    padding: 13rem;
+    border-bottom: 8px solid #222;
+    background: url(../img/fundo.jpg);
 }
 
 
