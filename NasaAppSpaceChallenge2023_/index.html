@@ -1,0 +1,397 @@
+<head>
+  <style> body { margin: 0; } </style>
+
+  <script src="//unpkg.com/d3-array"></script>
+  <script src="//unpkg.com/d3-scale"></script>
+
+  <script src="//unpkg.com/globe.gl"></script>
+  <script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>
+  <!--<script src="../../dist/globe.gl.js"></script>-->
+
+</head>
+<style>
+  body {
+    margin: 0;
+  }
+  .paragrafo{
+    padding-left: 7%; 
+    font-size: 18px; 
+    color: white; 
+    padding-right: 7%;
+    text-align: justify;
+  }
+  .landing{
+    position: fixed; 
+    top:0px; 
+    background-color: rgba(255, 255, 255, 0.3); 
+    width: 30%; 
+    height: 100%;
+    display:none
+  }
+  
+</style>
+
+<body>
+<div id="globeViz"></div>
+<!-- APOLLO 11 -->
+<div class="landing" id="div_event_95">
+  <p style="padding-left: 7%; font-size: 25px; color: white; padding-right: 7%;">1969, 20 July 20:17:40</p>
+  <p style="padding-left: 7%; font-size: 18px; color: white; padding-right: 7%;">
+    Apollo 11 mission's landing on the surface of the Moon, Latitude 0.67416, Longitude 23.473146.<br></p>
+  <img src="https://moon.nasa.gov/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBEdz09IiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--117432df4ef53e7aad753b16e62e34e6f30ce7cc/371255main_Seismic_1600.jpg?disposition=inline" style="padding-left: 10%; width: 80%;">
+  <p class="paragrafo">ALSEP 11, Mare Tranquillitatis, Moon	</p>
+  <p class="paragrafo">Link: <a href="https://moon.nasa.gov/resources/13/apollo-11-seismic-experiment/" target="_blank">Nasa</a></p>
+  <p class="paragrafo">Link: <a href="https://pt.wikipedia.org/wiki/Apollo_11" target="_blank">Wikipedia</a></p>
+</div>
+
+<!-- APOLLO 12 -->
+<div class="landing" id="div_event_87">
+  <p style="padding-left: 7%; font-size: 25px; color: white; padding-right: 7%;">1969, 19 November 06:54:35</p>
+  <p class="paragrafo">
+    Apollo 12 mission's landing on the surface of the Moon, Latitude -3.01084, Longitude -23.42456.<br></p>
+    <img src="https://history.nasa.gov/alsj/a12AttachBar6791.jpg" style="padding-left: 10%; width: 80%;">
+    <p class="paragrafo">ALSEP 12, Oceanus Procellarum, Moon</p>
+    <p class="paragrafo">Link: <a href="https://history.nasa.gov/alsj/HamishALSEP.html" target="_blank">Nasa</a></p>
+  <p class="paragrafo">Link: <a href="https://en.wikipedia.org/wiki/Apollo_12" target="_blank">Wikipedia</a></p>
+</div>
+
+<!-- APOLLO 14 -->
+<div class="landing" id="div_event_90">
+  <p style="padding-left: 7%; font-size: 25px; color: white; padding-right: 7%;">1971, 05 February 09:18:11</p>
+  <p class="paragrafo">
+    Apollo 14 mission's landing on the surface of the Moon, Latitude -3.6445, Longitude -17.47753.</p>
+    <img src="https://history.nasa.gov/alsj/a14RTG9366.jpg" style="padding-left: 10%; width: 80%;">
+    <p class="paragrafo">ALSEP 14, Fra Mauro, Moon</p>
+    <p class="paragrafo">Link: <a href="https://history.nasa.gov/alsj/HamishALSEP.html" target="_blank">Nasa</a></p>
+  <p class="paragrafo">Link: <a href="https://en.wikipedia.org/wiki/Apollo_14" target="_blank">Wikipedia</a></p>
+</div>
+
+<!-- APOLLO 15 -->
+<div class="landing" id="div_event_92">
+  <p style="padding-left: 7%; font-size: 25px; color: white; padding-right: 7%;">1971, 30 July 22:16:29</p>
+  <p class="paragrafo">
+    Apollo 15 mission's landing on the surface of the Moon, Latitude 26.13407, Longitude 3.62981.</p>
+    <img src="https://history.nasa.gov/alsj/hskap15alsepdiag_sm.jpg" style="padding-left: 10%; width: 80%;">
+    <p class="paragrafo">ALSEP 15, Hadley Rille, Moon</p>
+    <p class="paragrafo">Link: <a href="https://history.nasa.gov/alsj/HamishALSEP.html" target="_blank">Nasa</a></p>
+  <p class="paragrafo">Link: <a href="https://en.wikipedia.org/wiki/Apollo_15" target="_blank">Wikipedia</a></p>
+</div>
+
+<!-- APOLLO 16 -->
+<div class="landing" id="div_event_96">
+  <p style="padding-left: 7%; font-size: 25px; color: white; padding-right: 7%;">1972, 21 April 02:23:35</p>
+  <p class="paragrafo">
+    Apollo 16 mission's landing on the surface of the Moon, Latitude -8.97577, Longitude 15.49649.</p>
+    <img src="https://history.nasa.gov/alsj/as16-113-18347sm.jpg" style="padding-left: 10%; width: 80%;">
+    <p class="paragrafo">ALSEP 16, Descartes, Moon</p>
+    <p class="paragrafo">Link: <a href="https://history.nasa.gov/alsj/HamishALSEP.html" target="_blank">Nasa</a></p>
+  <p class="paragrafo">Link: <a href="https://en.wikipedia.org/wiki/Apollo_16" target="_blank">Wikipedia</a></p>
+</div>
+
+<!-- APOLLO 17 -->
+<div class="landing" id="div_event_94">
+  <p style="padding-left: 7%; font-size: 25px; color: white; padding-right: 7%;">1972, 11 December 19:47:22</p>
+  <p class="paragrafo">
+    Apollo 17 mission's landing on the surface of the Moon, Latitude 20.18935, Longitude 30.76996.</p>
+    <p class="paragrafo">Link: <a href="https://history.nasa.gov/alsj/HamishALSEP.html" target="_blank">Nasa</a></p>
+  <p class="paragrafo">Link: <a href="https://en.wikipedia.org/wiki/Apollo_17" target="_blank">Wikipedia</a></p>
+</div>
+
+<div class="landing" id="moonquakes">
+  <p class="paragrafo" style="font-size: 25px;" id="moonquake_date"></p>
+  <p class="paragrafo" style="font-size: 25px;" id="data_moonquake">
+  </p>
+</div>
+
+<div style="position: fixed; bottom: 0px; right: 0px;">
+<table border="0px">
+  <tr>
+    <td align="right">
+      <a href="javascript:All()"><img src="all.png"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table border="0px">
+        <tr>
+          <td><a href="javascript:Controler(1)"><img src="back.png"></a></td>
+          <td><a href="javascript:Controler(2)"><img src="pause.png"></a></td>
+          <td><a href="javascript:Controler(3)"><img src="play.png"></a></td>
+          <td><a href="javascript:Controler(4)"><img src="fast.png"></a></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>    
+
+</div>
+
+<script>
+  const colorScale = d3.scaleOrdinal(['orangered', 'mediumblue', 'darkgreen', 'yellow']);
+
+  const labelsTopOrientation = new Set(['Apollo 12', 'Luna 2', 'Luna 20', 'Luna 21', 'Luna 24', 'LCROSS Probe']); // avoid label collisions
+
+  const elem = document.getElementById('globeViz');
+  const moon = Globe()
+    .globeImageUrl('./lunar_surface.jpg')
+    .bumpImageUrl('./lunar_bumpmap.jpg')
+    .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+    .showGraticules(true)
+    .showAtmosphere(false) // moon has no atmosphere
+   
+    .pointAltitude('magnitude_x')
+    .onPointClick(d => window.open('javascript:ShowEvent('+d.id_event+')', '_self'))
+    .pointRadius(4)
+    .pointColor('color')
+
+    .labelText('label')
+    .labelSize('size')
+    .labelDotRadius(1.5)
+    .labelDotOrientation(d => labelsTopOrientation.has(d.label) ? 'top' : 'bottom')
+    //.labelColor(d => colorScale(d.agency))
+    //.labelLabel(d => `
+    //    <div><b>${d.label}</b></div>
+    //    <div>${d.agency} - ${d.program} Program</div>
+    //    <div>Landing on <i>${new Date(d.date).toLocaleDateString()}</i></div>
+    //  `)
+    //.onLabelClick(d => window.open(d.url, '_blank'))
+    (elem);
+
+  //fetch('./moon_landings.json').then(r => r.json()).then(landingSites => {
+    //console.log(landingSites);
+  //  moon.labelsData(landingSites);
+  //});
+
+  
+    //moon.pointsData(Data);
+    //var eventos = [];
+    /*
+    fetch('./nakamura_1979_sm_locations.json').then(r => r.json()).then(terremotos => {
+      for(i=0; i<terremotos.length; i++){
+        terremotos[i].magnitude_x = terremotos[i].magnitude / 7;
+      }
+      event = terremotos;
+      //moon.pointsData(terremotos);
+    });
+    */
+    fetch('./events.json').then(r => r.json()).then(data => {
+      for(i=0; i<data.length; i++){
+        if(data[i]['type'] == 2){
+          data[i].magnitude_x = data[i].magnitude / 7;
+          data[i].color = '#ffffaa';
+        }
+
+        if(data[i]['type'] == 3){
+          data[i].magnitude_x = data[i].Depth / 1000;
+          data[i].color = '#ffffff';
+        }
+        
+      }
+      event = data;  
+    });
+    
+    
+    var operation = 3;
+    var sequence = 0;
+    var time_refresh = 3000;
+    function Refresh(){
+      setTimeout(function(){
+        if(event.length <= sequence){
+          sequence = 0;
+        }
+        if(operation == 3){
+          Event();
+          sequence++;
+        }        
+        Refresh();
+      }, time_refresh)
+    }
+
+    Refresh();
+
+    function Event(){
+      moon.pointsData([]);
+      //console.log(sequence);
+      $('.landing').hide();
+
+
+
+      if(event[sequence]['type'] == 1){
+        $('#div_event_'+event[sequence]['id_event']).show();
+        event_landing = [];
+        for(i=0; i<=sequence; i++){
+          if(event[i]['type'] == 1){
+            event_landing.push(event[i]);
+          }
+        }
+        moon.labelsData(event_landing);
+      }
+
+      if(event[sequence]['type'] == 2){
+        
+        month = Month(event[sequence]['Month']);
+
+        if(event[sequence]['Day'] == null){
+          event[sequence]['Day'] = '';
+        }
+
+        let date_label = event[sequence]['Year']+','+event[sequence]['Day']+' '+month;
+        
+
+        $('#moonquake_date').html(date_label);
+        $('#moonquakes').show();
+        var data_moonquake = "<h2>Moonquake</h2><br>";
+            data_moonquake += "Magnitude: "+event[sequence]['magnitude']+"<br>";
+            data_moonquake += "Latitude: "+event[sequence]['lat']+"<br>";
+            data_moonquake += "Longitude: "+event[sequence]['lng']+"<br>";
+           
+        moon.pointsData([event[sequence]]);
+        $('#data_moonquake').html(data_moonquake);
+      }
+
+
+      if(event[sequence]['type'] == 3){
+
+        month = Month(event[sequence]['Month']);
+
+        if(event[sequence]['Day'] == null){
+          event[sequence]['Day'] = '';
+        }
+
+        let date_label = event[sequence]['Year']+','+event[sequence]['Day']+' '+month;
+
+
+        $('#moonquake_date').html(date_label);
+        $('#moonquakes').show();
+        var data_moonquake = "<h2>Moonquake</h2><br>";
+            data_moonquake += "Depth: "+event[sequence]['Depth']+"<br>";
+            data_moonquake += "Latitude: "+event[sequence]['lat']+"<br>";
+            data_moonquake += "Longitude: "+event[sequence]['lng']+"<br>";
+        moon.pointsData([event[sequence]]);
+        $('#data_moonquake').html(data_moonquake);    
+      }
+
+
+    }
+
+    function Controler(run){
+      operation = run;
+      if(operation == 1){
+        if(sequence == 0){
+          sequence = event.length - 1;
+        }else{
+          sequence--;
+        }
+        Event();
+      }
+      if(operation == 4){
+        if(sequence == (event.length - 1)){
+          sequence = 0;
+        }else{
+          sequence++;
+        }
+        Event();
+      }
+    }
+
+
+    function Month(data){
+      let month = '';
+        switch(data){
+          case 1:
+            month = 'January';
+            break;
+          case 2:
+            month = 'February';
+            break;
+          case 3:
+            month = 'March';
+            break;
+          case 4:
+            month = 'April';
+            break;
+          case 5:
+            month = 'May';
+            break;
+          case 6:
+            month = 'June';
+            break;
+          case 7:
+            month = 'July';
+            break;
+          case 8:
+            month = 'August';
+            break;
+          case 9:
+            month = 'September';  
+            break;
+          case 10:
+            month = 'October'; 
+            break;
+          case 11:
+            month = 'November'; 
+            break;
+          case 12:
+            month = 'December'; 
+            break;
+
+        }
+        return month;    
+    }
+
+    function ShowEvent(id){
+      console.log(id);
+
+      for(i=0; i<event.length; i++){
+          if(event[i]['id_event'] == id){
+            $('.landing').hide();
+            month = Month(event[i]['Month']);
+            let date_label = event[i]['Year']+','+event[i]['Day']+' '+month;
+            $('#moonquake_date').html(date_label);
+            $('#moonquakes').show();
+
+            if(event[i]['type'] == 2){
+              var data_moonquake = "<h2>Moonquake</h2><br>";
+                  data_moonquake += "Magnitude: "+event[i]['magnitude']+"<br>";
+                  data_moonquake += "Latitude: "+event[i]['lat']+"<br>";
+                  data_moonquake += "Longitude: "+event[i]['lng']+"<br>";
+            }
+
+            if(event[i]['type'] == 3){
+              var data_moonquake = "<h2>Moonquake</h2><br>";
+                  data_moonquake += "Depth: "+event[i]['Depth']+"<br>";
+                  data_moonquake += "Latitude: "+event[i]['lat']+"<br>";
+                  data_moonquake += "Longitude: "+event[i]['lng']+"<br>";    
+            }
+
+            $('#data_moonquake').html(data_moonquake);
+          }
+      }    
+
+    }
+
+    function All(){
+      operation = 2;
+      
+      event_landing = [];
+      moonquake = [];
+      for(i=0; i<event.length; i++){
+        if(event[i]['type'] == 1){
+          event_landing.push(event[i]);
+        }
+
+        if(event[i]['type'] == 2 || event[i]['type'] == 3){
+          moonquake.push(event[i]);
+        }
+      }
+
+      //moon.labelsData(event_landing);
+      moon.pointsData(moonquake);
+
+    }
+
+</script>
+</body>
