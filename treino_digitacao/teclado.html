@@ -1,0 +1,301 @@
+<style>
+	.tecla
+	{
+		width: 4em;
+		height: 4em;
+		background-color: green;
+		position: relative;
+		text-align: center;
+		color: white;
+		border-radius: 1em;	
+		margin-left: 0.5em;
+    	margin-right: 0.5em;
+	}
+	/*
+	#caixa_teclado {
+    	display: flex;
+	}*/
+	#teclado
+	{
+		top: 5em;
+		/*left: 17em;*/
+		position: relative;
+		/*width: 80em;*/
+		width: fit-content;
+		flex-direction: row;
+		place-content:center;
+	}
+	#entrada
+	{
+		position: relative;
+    	top: 22em;
+		text-align-last: center;
+	}
+	textarea#entrada_dados 
+	{
+		border-width: thick;
+		width: 65em;
+		height: 6em;
+		font-size: 1em;
+    	text-align-last: start;
+	}
+	div#texto_exercicio {
+    	font-size: 0.4em;
+	}
+	div#caixa_texto_exercicio 
+	{
+		/*display: flex;*/
+		position: relative;
+		font-size: 7em;
+		/*text-align: center;*/
+		flex-wrap: nowrap;
+		/*clear: both;*/
+		/*top: 10em;*/
+	}
+	div#body 
+	{
+		top: 1em;
+		position: relative;
+	}
+	.errado
+	{
+		color: red;
+	}
+	.certo
+	{
+		color: green;
+	}
+	.neutro
+	{
+		color:black
+	}
+	#painel 
+	{
+		justify-self: center;
+		top: 25em;
+	}
+	div#rodape 
+	{
+    	height: 5%;
+	}
+	div#header 
+	{
+    	height: 5%;
+	}
+	button#limpar 
+	{
+		position: relative;
+		top: 30em;
+	}
+	button#proximoDesafio {
+		position: relative;
+		top: inherit;
+	}
+	.espaco {
+		display: contents;
+		margin-left: 3em;
+		position: relative;
+	}
+</style>
+<script src="./niveis.js">
+	import {niveis} from 'niveis.js'; 
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Teclado Digital</title>
+</head>
+<body>
+	<div id="header">
+
+	</div>
+	<div id="body">
+		<div id="caixa_texto_exercicio">
+			<p id="mensagem"><center> </center></p>
+			<center><div for="" id="texto_exercicio" value="asdfg"><p id=""><span class="neutro">a</span><span class="neutro">s</span><span class="neutro">d</span><span class="neutro">f</span><span  class="neutro">g</span></p></div></center>
+			<script>
+				function exibeMensagem(mensagem)
+				{
+					alert(mensagem);
+				}
+			</script>
+		</div>
+
+		<div id="caixa_teclado">
+			<center>
+			<div class="teclado" id="teclado"></div>
+			</center>
+		</div>
+		<div id="entrada">
+			<textarea name="" id="entrada_dados" onkeydown="pegar_digitacao(this)"></textarea>
+		</div>
+		
+	</div>
+	<div id="rodape">
+			<div id="painel">
+				<button type="button" id="limpar" onClick="limpar()">Limpar</button>
+				<div class="espaco"> ____ </div>
+				<script>
+					var contador_proximo_nivel = 1;
+				</script>
+				<button type="button" id="proximoDesafio" onClick="comecar('comecou')">Proximo Desafio</button>
+			</div>
+		</div>
+</body>
+</html>
+<script>
+
+	
+
+	function gerarStringAleatoria(tamanho, classe = "neutro") 
+	{
+		let resultado = '';
+		let resultado_tag = '';
+		const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		for (let i = 0; i < tamanho; i++) {
+			const letra = caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+			resultado_tag += `<span class="${classe}">${letra}</span>`;
+			resultado += letra;
+		}
+		return {"text":resultado, "html":resultado_tag};
+	}
+
+
+	function proximoDesafio(linguagem='python', numero)
+	{
+
+		if (JSON.parse(localStorage.getItem(linguagem+'_'+'nivel'+numero))[1] != null) {
+
+			let entrada_dados = document.getElementById('entrada_dados');
+			entrada_dados.value = '';
+
+			classe = "neutro";
+			console.log(linguagem+'_'+'nivel'+numero);
+			let temp = JSON.parse(localStorage.getItem(linguagem+'_'+'nivel'+numero))[1];
+			console.log(temp);
+			let resultado = '';
+			let resultado_tag = '';
+
+			for (let i = 0; i < temp.length; i++) {
+				let char = temp[i];
+				if (char === '\n') {
+					resultado_tag += `<span class="${classe}">⏎</span>`;  // simboliza o enter visualmente
+					resultado += '\n';  // continua armazenando o caractere real
+				} else {
+					resultado_tag += `<span class="${classe}">${char}</span>`;
+					resultado += char;
+				}
+			}
+			return {"text": resultado, "html": resultado_tag};
+		}else{
+
+			console.log('Finall....');
+		}
+	}
+	
+	function limpar()
+	{
+		let entrada_dados = document.getElementById('entrada_dados');
+		entrada_dados.value = '';
+
+		const spans = document.querySelectorAll("#texto_exercicio span");
+
+		spans.forEach(span => {
+			span.style.color = "black";       // Define a cor como preto
+			span.className = "neutro";        // Restaura a classe original (opcional)
+		});
+
+		location.reload();
+	}
+	
+	//entrada_dados.addEventListener("keydown", pegar_digitacao(this));
+
+	function criar_teclado()
+	{
+		
+		let letras_teclado = "ASDFGHJKLÇ~]";
+		let left=4;
+		let teclado = document.getElementById("teclado");
+		teclado.style.display = 'flex';
+		for( i=0; i < 12; i++ ){
+
+			let div = document.createElement("div");
+			div.className="tecla";
+			div.id = "tecla_"+i;
+			div.innerText = letras_teclado[i];
+			
+			teclado.append(div);
+			//div.style.text-align= center;
+			//div.style.left= left * (i+(i*4));
+			
+		}
+	}
+	
+	function verifica_sucesso(sucesso)
+	{
+		if(sucesso){
+			mensagem = "Acertou!!!";
+			exibeMensagem(mensagem);
+			contador_proximo_nivel++;
+		}else{
+			mensagem = "Errouuuu!!!";
+			exibeMensagem(mensagem);
+			limpar();
+		}
+	}
+
+	
+	function pegar_digitacao(entrada_dados)
+	{
+		let texto_exercicio = document.getElementById("texto_exercicio").innerText.trim();
+		if (posicao_digitada < texto_exercicio.length) {
+			let botao_clicado = event.key;
+
+			if (botao_clicado !== 'CapsLock' && botao_clicado !== 'Shift') {
+				let esperado = texto_exercicio[posicao_digitada];
+				if (esperado === '⏎') esperado = '\n'; // mapeamento visual para funcional
+
+				if (botao_clicado === esperado || (botao_clicado === "Enter" && esperado === '\n')) {
+					document.querySelector("#texto_exercicio > span:nth-child(" + (posicao_digitada + 1) + ")").style.color = 'green';
+				} else {
+					sucesso = 0;
+					document.querySelector("#texto_exercicio > span:nth-child(" + (posicao_digitada + 1) + ")").style.color = 'red';
+				}
+				posicao_digitada++;
+			}
+		} else {
+			verifica_sucesso(sucesso);
+		}
+	}
+	
+
+	function comecar(metodo='')
+	{
+		criar_teclado();
+	
+		exercicio = document.getElementById('texto_exercicio');
+
+		let temp ='';
+		if(metodo == ''){
+
+			temp = gerarStringAleatoria(10);
+		}else{
+
+			temp = proximoDesafio('python',contador_proximo_nivel);
+		}
+
+		exercicio.setAttribute("value", temp['text']);
+		exercicio.innerHTML = temp['html'];
+		posicao_digitada = 0;
+		sucesso = 1;
+	}
+
+	var posicao_digitada = 0;
+	var sucesso = 1;
+						
+
+	comecar('comecar');
+	//comecar();
+</script>
