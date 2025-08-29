@@ -15,9 +15,10 @@
 	#caixa_teclado {
     	display: flex;
 	}*/
-	#teclado
+
+	#teclado9
 	{
-		top: 5em;
+		top: 8em;
 		/*left: 17em;*/
 		position: relative;
 		/*width: 80em;*/
@@ -25,6 +26,42 @@
 		flex-direction: row;
 		place-content:center;
 	}
+
+	#teclado0
+	{
+		top: 9em;
+		/*left: 17em;*/
+		position: relative;
+		/*width: 80em;*/
+		width: fit-content;
+		flex-direction: row;
+		place-content:center;
+	}
+	
+	#teclado
+	{
+		top: 10em;
+		/*left: 17em;*/
+		position: relative;
+		/*width: 80em;*/
+		width: fit-content;
+		flex-direction: row;
+		place-content:center;
+	}
+	
+	
+
+	#teclado1
+	{
+		top: 11em;
+		/*left: 17em;*/
+		position: relative;
+		/*width: 80em;*/
+		width: fit-content;
+		flex-direction: row;
+		place-content:center;
+	}
+	
 	#entrada
 	{
 		position: relative;
@@ -96,6 +133,9 @@
 		margin-left: 3em;
 		position: relative;
 	}
+	div#instrucoes {
+   		font-size: 1.3em;
+	}
 </style>
 <script src="./niveis.js">
 	import {niveis} from 'niveis.js'; 
@@ -109,7 +149,14 @@
 </head>
 <body>
 	<div id="header">
-
+		<center><div id="instrucoes"">Instruções:</div></center>
+		<center><div id="instrucoes"">Digite os caracteres conforme está no texto acima. 
+			Caso fique verde é que está correto.<br> Após digitar todos corretamente (Tudo deve ficar verde)
+		Aperte o botão enter para receber a mensagem de sucesso!!! <br>
+		Após digitar o botão Recomeçar este nível / Proximo Desafio para ir ao próximo desafio.
+		Caso fique com caractere vermelhor.<br> Aperte este mesmo botão para recomeçar o nível ou aperte Voltar ao início do primeiro desafio recomeçando o jogo.
+		</div>
+		</center>
 	</div>
 	<div id="body">
 		<div id="caixa_texto_exercicio">
@@ -125,7 +172,11 @@
 
 		<div id="caixa_teclado">
 			<center>
-			<div class="teclado" id="teclado"></div>
+				<div class="teclado" id="teclado9"></div>	
+				<div class="teclado" id="teclado0"></div>	
+				<div class="teclado" id="teclado"></div>
+				<div class="teclado" id="teclado1"></div>
+			
 			</center>
 		</div>
 		<div id="entrada">
@@ -135,19 +186,22 @@
 	</div>
 	<div id="rodape">
 			<div id="painel">
-				<button type="button" id="limpar" onClick="limpar()">Limpar</button>
+				<button type="button" id="limpar" onClick="limpar()">Voltar ao início do primeiro desafio</button>
 				<div class="espaco"> ____ </div>
 				<script>
 					var contador_proximo_nivel = 1;
 				</script>
-				<button type="button" id="proximoDesafio" onClick="comecar('comecou')">Proximo Desafio</button>
+				<button type="button" id="proximoDesafio" onClick="comecar('comecou')">Recomeçar este nível / Proximo Desafio</button>
 			</div>
 		</div>
 </body>
 </html>
 <script>
 
-	
+	document.addEventListener('DOMContentLoaded', function(){
+
+		criar_teclado();
+	});
 
 	function gerarStringAleatoria(tamanho, classe = "neutro") 
 	{
@@ -214,12 +268,48 @@
 
 	function criar_teclado()
 	{
-		
-		let letras_teclado = "ASDFGHJKLÇ~]";
+		let letras_teclado9 = "'1234567890-=ß";
 		let left=4;
-		let teclado = document.getElementById("teclado");
+		let teclado9 = document.getElementById("teclado9");
+		let linha = 14;
+		teclado9.style.display = 'flex';
+		for( i=0; i < linha; i++ ){
+
+			let div = document.createElement("div");
+			div.className="tecla";
+			div.id = "tecla_"+i;
+			div.innerText = letras_teclado9[i];
+			
+			teclado9.append(div);
+			//div.style.text-align= center;
+			//div.style.left= left * (i+(i*4));
+			
+		}
+
+		letras_teclado0 = "Ťqwertyuiop´[";
+		left=4;
+		teclado0 = document.getElementById("teclado0");
+		linha = 13;
+		teclado0.style.display = 'flex';
+		for( i=0; i < linha; i++ ){
+
+			let div = document.createElement("div");
+			div.className="tecla";
+			div.id = "tecla_"+i;
+			div.innerText = letras_teclado0[i];
+			
+			teclado0.append(div);
+			//div.style.text-align= center;
+			//div.style.left= left * (i+(i*4));
+			
+		}
+		
+		letras_teclado = "→ASDFGHJKLÇ~]⏎";
+		left=4;
+		teclado = document.getElementById("teclado");
+		linha = 14;
 		teclado.style.display = 'flex';
-		for( i=0; i < 12; i++ ){
+		for( i=0; i < linha; i++ ){
 
 			let div = document.createElement("div");
 			div.className="tecla";
@@ -231,6 +321,28 @@
 			//div.style.left= left * (i+(i*4));
 			
 		}
+
+		
+		letras_teclado1 = "¶\\zxcvbnm,.;¶";
+		left=4;
+		teclado1 = document.getElementById("teclado1");
+		linha = 13;
+		teclado1.style.display = 'flex';
+		for( i=0; i < linha; i++ ){
+
+			let div = document.createElement("div");
+			div.className="tecla";
+			div.id = "tecla_"+i;
+			div.innerText = letras_teclado1[i];
+			
+			teclado1.append(div);
+			//div.style.text-align= center;
+			//div.style.left= left * (i+(i*4));
+			
+		}
+
+		
+
 	}
 	
 	function verifica_sucesso(sucesso)
@@ -273,7 +385,8 @@
 
 	function comecar(metodo='')
 	{
-		criar_teclado();
+	
+		//criar_teclado();
 	
 		exercicio = document.getElementById('texto_exercicio');
 
