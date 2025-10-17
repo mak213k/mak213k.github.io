@@ -1,0 +1,34 @@
+<input type="file" id="fileInput" accept="audio/mp3">
+<script>
+
+// // converter.js
+// const fs = require("fs");
+
+// // Caminho do arquivo MP3
+// const filePath = "jupiter.mp3";
+
+// // Lê o arquivo e converte para Base64
+// const fileData = fs.readFileSync(filePath);
+// const base64Data = fileData.toString("base64");
+
+// // Salva em um .txt para reutilizar no código
+// fs.writeFileSync("jupiter_base64.txt", base64Data);
+
+// console.log("Arquivo convertido para Base64 com sucesso!");
+
+
+  document.getElementById("fileInput").addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function() {
+      // Base64 do MP3
+      const base64Data = reader.result.split(",")[1];
+      console.log(base64Data);
+    };
+
+    reader.readAsDataURL(file);
+  });
+  
+</script>
+
