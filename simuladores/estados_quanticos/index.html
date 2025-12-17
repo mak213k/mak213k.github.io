@@ -1,0 +1,290 @@
+
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Qubit — Esfera de Bloch (melhorada)</title>
+<style>
+  :root{--bg:#050814;--card:rgba(255,255,255,0.04);--muted:rgba(255,255,255,0.6)}
+  html,body{height:100%;margin:0;background:var(--bg);color:#e6eef8;font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
+  #container{width:100%;height:100%;position:relative}
+  .hud{
+    position: absolute; left:12px; top:12px; z-index:20;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,0.04); padding:12px; border-radius:10px; box-shadow:0 8px 30px rgba(0,0,0,0.5);
+    min-width:320px;
+  }
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  button{background:#0f1724;color:#e6eef8;border:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04)}
+  .small{padding:6px 8px;font-size:13px}
+  label{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+  input[type=range]{width:160px}
+  .panel{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  pre{margin:0;padding:8px;background:transparent;color:#bfe1ff;border-radius:6px;font-size:13px}
+  #info{font-size:13px;color:var(--muted);margin-top:6px}
+  .footer{position:absolute;right:12px;top:12px;color:var(--muted);z-index:10;padding:8px;background:transparent}
+  canvas{display:block}
+</style>
+</head>
+<body>
+<div id="container"></div>
+
+<div class="hud" id="hud">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <strong>Esfera de Bloch — Qubit</strong>
+    <div style="display:flex;gap:6px">
+      <button id="resetBtn" class="small ghost">Reset θφ</button>
+      <button id="measureBtn" class="small" style="background:#ef4444">Medir</button>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:10px">
+    <button id="btn0" class="small">|0〉</button>
+    <button id="btn1" class="small">|1〉</button>
+    <button id="btnPlus" class="small">|+〉</button>
+    <button id="btnMinus" class="small">|-〉</button>
+    <button id="playPause" class="small">⏸ Pause</button>
+  </div>
+
+  <div class="panel">
+    <div>
+      <label>θ (polar)
+        <input id="thetaRange" type="range" min="0" max="180" value="60"/>
+        <span id="thetaVal">60°</span>
+      </label>
+      <label style="margin-top:6px">φ (azimutal)
+        <input id="phiRange" type="range" min="-180" max="180" value="0"/>
+        <span id="phiVal">0°</span>
+      </label>
+      <label style="margin-top:6px">Velocidade
+        <input id="speedRange" type="range" min="0" max="200" value="20"/>
+        <span id="speedVal">20</span>
+      </label>
+      <label style="margin-top:6px">
+        <input id="toggleAxes" type="checkbox" checked /> Mostrar eixos
+      </label>
+      <label>
+        <input id="toggleEquator" type="checkbox" checked /> Mostrar círculo (equador)
+      </label>
+    </div>
+
+    <div>
+      <div style="margin-bottom:6px;color:var(--muted)">Amplitudes (α, β)</div>
+      <pre id="amps">α = ...\nβ = ...</pre>
+      <div style="height:8px"></div>
+      <div style="color:var(--muted);margin-bottom:6px">Probabilidades</div>
+      <pre id="probs">P(0)=...\nP(1)=...</pre>
+      <div id="info">Use o mouse para girar/zoom. Ajuste θ/φ para ver o vetor na esfera.</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Clique na HUD ou pressione qualquer tecla para interação</div>
+
+<!-- Three.js 0.124 + OrbitControls via script -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.124.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.124.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+// ========== Setup Three.js ==========
+const container = document.getElementById('container');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 1000);
+camera.position.set(2.8, 2.0, 2.8);
+
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth, innerHeight);
+renderer.setClearColor(0x050814);
+container.appendChild(renderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.rotateSpeed = 0.7;
+
+// lights
+const pLight = new THREE.PointLight(0xffffff, 1);
+pLight.position.set(4,4,4);
+scene.add(pLight);
+scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+
+// ========== Bloch sphere ==========
+const sphereGeom = new THREE.SphereGeometry(1, 64, 64);
+const sphereMat = new THREE.MeshPhongMaterial({color:0x2b6cb0, transparent:true, opacity:0.12});
+const sphere = new THREE.Mesh(sphereGeom, sphereMat);
+scene.add(sphere);
+
+// equator circle (line)
+function makeCircleLine(radius=1, segments=128, y=0, color=0x3b82f6){
+  const pts = [];
+  for(let i=0;i<=segments;i++){
+    const t = (i/segments)*Math.PI*2;
+    pts.push(new THREE.Vector3(Math.cos(t)*radius, y, Math.sin(t)*radius));
+  }
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const mat = new THREE.LineBasicMaterial({color: color, linewidth: 2, opacity:0.9});
+  return new THREE.Line(geo, mat);
+}
+const equator = makeCircleLine(1, 256, 0, 0x60a5fa);
+scene.add(equator);
+
+// small meridian circle (for visual)
+const meridian = makeCircleLine(1, 128, 0, 0x2b6cb0);
+meridian.rotation.z = Math.PI/2;
+meridian.material.opacity = 0.06;
+scene.add(meridian);
+
+// axes
+const axesHelper = new THREE.AxesHelper(1.25);
+scene.add(axesHelper);
+
+// base state arrows |0> (up) and |1> (down)
+const arrowUp = new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1, 0x22c55e, 0.06, 0.06);
+const arrowDown = new THREE.ArrowHelper(new THREE.Vector3(0,-1,0), new THREE.Vector3(0,0,0), 1, 0xef4444, 0.06, 0.06);
+scene.add(arrowUp); scene.add(arrowDown);
+
+// state arrow (yellow)
+const stateDir = new THREE.Vector3(0,1,0);
+const stateArrow = new THREE.ArrowHelper(stateDir.clone().normalize(), new THREE.Vector3(0,0,0), 1, 0xfacc15, 0.08, 0.08);
+scene.add(stateArrow);
+
+// ========== Quantum state (theta, phi) ==========
+let thetaDeg = 60; // [0,180]
+let phiDeg = 0;    // [-180,180]
+let rotSpeed = 20; // degrees per sec on phi
+let playing = true;
+let lastTime = performance.now();
+
+// UI elements
+const thetaRange = document.getElementById('thetaRange');
+const phiRange = document.getElementById('phiRange');
+const thetaVal = document.getElementById('thetaVal');
+const phiVal = document.getElementById('phiVal');
+const speedRange = document.getElementById('speedRange');
+const speedVal = document.getElementById('speedVal');
+const ampsEl = document.getElementById('amps');
+const probsEl = document.getElementById('probs');
+const playPauseBtn = document.getElementById('playPause');
+const btn0 = document.getElementById('btn0'), btn1 = document.getElementById('btn1'), btnPlus = document.getElementById('btnPlus'), btnMinus = document.getElementById('btnMinus');
+const resetBtn = document.getElementById('resetBtn'), measureBtn = document.getElementById('measureBtn');
+const toggleAxes = document.getElementById('toggleAxes'), toggleEquator = document.getElementById('toggleEquator');
+
+// update UI values
+function updateUIFields(){
+  thetaVal.textContent = thetaDeg.toFixed(1) + '°';
+  phiVal.textContent = phiDeg.toFixed(1) + '°';
+  speedVal.textContent = rotSpeed.toFixed(0);
+  // amplitudes from theta, phi:
+  const t = thetaDeg*Math.PI/180;
+  const p = phiDeg*Math.PI/180;
+  // α = cos(θ/2)
+  const alpha = {re: Math.cos(t/2), im: 0};
+  // β = e^{iφ} sin(θ/2)
+  const beta = {re: Math.cos(p)*Math.sin(t/2), im: Math.sin(p)*Math.sin(t/2)};
+  const p0 = alpha.re*alpha.re + alpha.im*alpha.im;
+  const p1 = beta.re*beta.re + beta.im*beta.im;
+  ampsEl.textContent = `α = ${alpha.re.toFixed(4)} ${alpha.im>=0?'+':''}${alpha.im.toFixed(4)}i\nβ = ${beta.re.toFixed(4)} ${beta.im>=0?'+':''}${beta.im.toFixed(4)}i`;
+  probsEl.textContent = `P(0) = ${p0.toFixed(4)}\nP(1) = ${p1.toFixed(4)}`;
+}
+
+// apply angles to state arrow
+function applyAnglesToArrow(){
+  const t = thetaDeg*Math.PI/180;
+  const p = phiDeg*Math.PI/180;
+  const x = Math.sin(t)*Math.cos(p);
+  const y = Math.cos(t);
+  const z = Math.sin(t)*Math.sin(p);
+  const vec = new THREE.Vector3(x,y,z);
+  stateArrow.setDirection(vec.normalize());
+}
+
+// UI handlers
+thetaRange.addEventListener('input', ()=>{ thetaDeg = Number(thetaRange.value); updateUIFields(); applyAnglesToArrow(); });
+phiRange.addEventListener('input', ()=>{ phiDeg = Number(phiRange.value); updateUIFields(); applyAnglesToArrow(); });
+speedRange.addEventListener('input', ()=>{ rotSpeed = Number(speedRange.value); updateUIFields(); });
+
+btn0.addEventListener('click', ()=>{ thetaDeg = 0; phiDeg = 0; thetaRange.value = thetaDeg; phiRange.value = phiDeg; updateUIFields(); applyAnglesToArrow(); });
+btn1.addEventListener('click', ()=>{ thetaDeg = 180; phiDeg = 0; thetaRange.value = thetaDeg; phiRange.value = phiDeg; updateUIFields(); applyAnglesToArrow(); });
+btnPlus.addEventListener('click', ()=>{ thetaDeg = 90; phiDeg = 0; thetaRange.value = thetaDeg; phiRange.value = phiDeg; updateUIFields(); applyAnglesToArrow(); });
+btnMinus.addEventListener('click', ()=>{ thetaDeg = 90; phiDeg = 180; thetaRange.value = thetaDeg; phiRange.value = phiDeg; updateUIFields(); applyAnglesToArrow(); });
+
+playPauseBtn.addEventListener('click', ()=>{
+  playing = !playing;
+  playPauseBtn.textContent = playing ? "⏸ Pause" : "▶ Play";
+});
+
+resetBtn.addEventListener('click', ()=>{ thetaDeg = 60; phiDeg = 0; rotSpeed = 20; thetaRange.value = thetaDeg; phiRange.value = phiDeg; speedRange.value = rotSpeed; updateUIFields(); applyAnglesToArrow(); });
+
+toggleAxes.addEventListener('change', ()=>{ axesHelper.visible = toggleAxes.checked; arrowUp.visible = toggleAxes.checked; arrowDown.visible = toggleAxes.checked; });
+toggleEquator.addEventListener('change', ()=>{ equator.visible = toggleEquator.checked; meridian.visible = toggleEquator.checked; });
+
+// measurement: collapse probabilistically to |0> or |1>
+measureBtn.addEventListener('click', ()=>{
+  const t = thetaDeg*Math.PI/180;
+  const p0 = Math.cos(t/2)**2;
+  const r = Math.random();
+  const result = (r < p0) ? 0 : 1;
+  // animate collapse
+  animateCollapse(result);
+});
+
+// collapse animation: tween phi/theta to target
+let collapseTween = null;
+function animateCollapse(result){
+  // target angles: |0> => theta=0 ; |1> => theta=180
+  const targetTheta = result===0?0:180;
+  const startTheta = thetaDeg;
+  const duration = 600; // ms
+  const start = performance.now();
+  collapseTween = {startTheta, targetTheta, start, duration};
+}
+
+// main render loop
+function animate(time){
+  requestAnimationFrame(animate);
+  const now = performance.now();
+  const dt = (now - lastTime)/1000; lastTime = now;
+
+  // auto-rotate phi when playing
+  if(playing && !collapseTween){
+    phiDeg += rotSpeed * dt;
+    if(phiDeg > 180) phiDeg -= 360;
+    phiRange.value = phiDeg;
+  }
+
+  // collapse tween handling
+  if(collapseTween){
+    const t0 = collapseTween.start;
+    const elapsed = now - t0;
+    const u = Math.min(1, elapsed / collapseTween.duration);
+    // smooth step
+    const s = u*(2-u);
+    thetaDeg = collapseTween.startTheta + (collapseTween.targetTheta - collapseTween.startTheta)*s;
+    thetaRange.value = thetaDeg;
+    // if finished:
+    if(u >= 1){ collapseTween = null; playing = false; playPauseBtn.textContent = "▶ Play"; }
+  }
+
+  updateUIFields();
+  applyAnglesToArrow();
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+lastTime = performance.now();
+updateUIFields();
+applyAnglesToArrow();
+animate();
+
+// handle resize
+window.addEventListener('resize', ()=>{ camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+
+// user gesture helper: click on HUD or canvas will count as interaction (useful for AudioContext unlocking in other flows)
+document.getElementById('hud').addEventListener('click', ()=>{ /* no-op but a real gesture */ });
+renderer.domElement.addEventListener('click', ()=>{ /* no-op gesture */ });
+
+</script>
+</body>
+</html>
