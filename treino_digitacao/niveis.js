@@ -4,7 +4,7 @@ localStorage.setItem("python_nivel1",JSON.stringify({1:
 }));
 
 localStorage.setItem("python_nivel2",JSON.stringify({1:
-    "if 1 < 2:\n\tprint('imprima if')else:\n\tprint('imprima else')"
+    "if 1 < 2:\n\tprint('imprima if')\nelse:\n\tprint('imprima else')"
 }));
 localStorage.setItem("python_nivel3", JSON.stringify({1:
     "x = 10\nif x > 0:\n\tprint('positivo')\nelif x == 0:\n\tprint('zero')\nelse:\n\tprint('negativo')"
