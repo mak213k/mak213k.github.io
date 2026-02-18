@@ -1,25 +1,25 @@
 // localStorage.setItem("nivel1",JSON.stringify({1:"asdfghjklç"}));
 localStorage.setItem("python_nivel1",JSON.stringify({1:
-    "if 1 < 2:\n    print('hello')"
+    "if 1 < 2:\n\tprint('hello')"
 }));
 
 localStorage.setItem("python_nivel2",JSON.stringify({1:
-    "if 1 < 2:\n    print('imprima if')else:\nprint('imprima else')"
+    "if 1 < 2:\n\tprint('imprima if')else:\n\tprint('imprima else')"
 }));
 localStorage.setItem("python_nivel3", JSON.stringify({1:
-    "x = 10\nif x > 0:\n    print('positivo')\nelif x == 0:\n    print('zero')\nelse:\n    print('negativo')"
+    "x = 10\nif x > 0:\n\tprint('positivo')\nelif x == 0:\n\tprint('zero')\nelse:\n\tprint('negativo')"
 }));
 
 localStorage.setItem("python_nivel4", JSON.stringify({1:
-    "for i in range(3):\n    print('Número:', i)"
+    "for i in range(3):\n\tprint('Número:', i)"
 }));
 
 localStorage.setItem("python_nivel5", JSON.stringify({1:
-    "x = 0\nwhile x < 3:\n    print(x)\n    x += 1"
+    "x = 0\nwhile x < 3:\n\tprint(x)\n\tx += 1"
 }));
 
 localStorage.setItem("python_nivel6", JSON.stringify({1:
-    "frutas = ['maçã', 'banana', 'cereja']\nfor fruta in frutas:\n    print(fruta)"
+    "frutas = ['maçã', 'banana', 'cereja']\nfor fruta in frutas:\n\tprint(fruta)"
 }));
 
 localStorage.setItem("python_nivel7", JSON.stringify({1:
@@ -31,30 +31,30 @@ localStorage.setItem("python_nivel8", JSON.stringify({1:
 }));
 
 localStorage.setItem("python_nivel9", JSON.stringify({1:
-    "try:\n    resultado = 10 / 0\nexcept ZeroDivisionError:\n    print('Erro: divisão por zero')"
+    "try:\n\tresultado = 10 / 0\nexcept ZeroDivisionError:\n\tprint('Erro: divisão por zero')"
 }));
 
 localStorage.setItem("python_nivel10", JSON.stringify({1:
-    "with open('arquivo.txt', 'w') as f:\n    f.write('Olá, mundo!')"
+    "with open('arquivo.txt', 'w') as f:\n\tf.write('Olá, mundo!')"
 }));
 localStorage.setItem("python_nivel3", JSON.stringify({1:
-    "if idade >= 18:\n    print('Maior de idade')\nelse:\n    print('Menor de idade')"
+    "if idade >= 18:\n\tprint('Maior de idade')\nelse:\n\tprint('Menor de idade')"
 }));
 
 localStorage.setItem("python_nivel4", JSON.stringify({1:
-    "nota = 85\nif nota >= 90:\n    print('A')\nelif nota >= 80:\n    print('B')\nelif nota >= 70:\n    print('C')\nelse:\n    print('Reprovado')"
+    "nota = 85\nif nota >= 90:\n\tprint('A')\nelif nota >= 80:\n\tprint('B')\nelif nota >= 70:\n\tprint('C')\nelse:\n\tprint('Reprovado')"
 }));
 
 localStorage.setItem("python_nivel5", JSON.stringify({1:
-    "for i in range(5):\n    print('Número:', i)"
+    "for i in range(5):\n\tprint('Número:', i)"
 }));
 
 localStorage.setItem("python_nivel6", JSON.stringify({1:
-    "contador = 0\nwhile contador < 3:\n    print('Contando:', contador)\n    contador += 1"
+    "contador = 0\nwhile contador < 3:\n\tprint('Contando:', contador)\n\tcontador += 1"
 }));
 
 localStorage.setItem("python_nivel7", JSON.stringify({1:
-    "frutas = ['maçã', 'banana', 'uva']\nfor fruta in frutas:\n    print(fruta)"
+    "frutas = ['maçã', 'banana', 'uva']\nfor fruta in frutas:\n\tprint(fruta)"
 }));
 
 localStorage.setItem("python_nivel8", JSON.stringify({1:
@@ -66,18 +66,18 @@ localStorage.setItem("python_nivel9", JSON.stringify({1:
 }));
 
 localStorage.setItem("python_nivel10", JSON.stringify({1:
-    "try:\n    x = 1 / 0\nexcept ZeroDivisionError:\n    print('Não é possível dividir por zero')"
+    "try:\n\tx = 1 / 0\nexcept ZeroDivisionError:\n\tprint('Não é possível dividir por zero')"
 }));
 
 localStorage.setItem("python_nivel11", JSON.stringify({1:
-    "with open('arquivo.txt', 'r') as f:\n    conteudo = f.read()\n    print(conteudo)"
+    "with open('arquivo.txt', 'r') as f:\n\tconteudo = f.read()\n\tprint(conteudo)"
 }));
 localStorage.setItem("python_nivel12", JSON.stringify({1:
-    "def saudacao(nome):\n    print('Olá,', nome)\n\nsaudacao('Lucas')"
+    "def saudacao(nome):\n\tprint('Olá,', nome)\n\nsaudacao('Lucas')"
 }));
 
 localStorage.setItem("python_nivel13", JSON.stringify({1:
-    "class Pessoa:\n    def __init__(self, nome):\n        self.nome = nome\n\n    def apresentar(self):\n        print('Meu nome é', self.nome)\n\np = Pessoa('Maria')\np.apresentar()"
+    "class Pessoa:\n\tdef __init__(self, nome):\n\tself.nome = nome\n\n\tdef apresentar(self):\n\t\tprint('Meu nome é', self.nome)\n\np = Pessoa('Maria')\np.apresentar()"
 }));
 
 localStorage.setItem("python_nivel14", JSON.stringify({1:

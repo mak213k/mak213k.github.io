@@ -228,16 +228,22 @@
 			classe = "neutro";
 			console.log(linguagem+'_'+'nivel'+numero);
 			let temp = JSON.parse(localStorage.getItem(linguagem+'_'+'nivel'+numero))[1];
-			console.log(temp);
+			
 			let resultado = '';
 			let resultado_tag = '';
 
 			for (let i = 0; i < temp.length; i++) {
 				let char = temp[i];
+				
 				if (char === '\n') {
 					resultado_tag += `<span class="${classe}">⏎</span>`;  // simboliza o enter visualmente
-					resultado += '\n';  // continua armazenando o caractere real
+					//resultado += '\n'.trim();
+					
+				}else if (char === '\t') {
+					resultado_tag += `<span class="${classe}">→</span>`;  // simboliza o tab visualmente
+					//resultado += '\t'.trim();  // continua armazenando o caractere real
 				} else {
+					console.log(resultado);  // continua armazenando o caractere real
 					resultado_tag += `<span class="${classe}">${char}</span>`;
 					resultado += char;
 				}
@@ -362,16 +368,40 @@
 	function pegar_digitacao(entrada_dados)
 	{
 		let texto_exercicio = document.getElementById("texto_exercicio").innerText.trim();
+
+		
 		if (posicao_digitada < texto_exercicio.length) {
 			let botao_clicado = event.key;
+			
+			if (botao_clicado === "Tab") {
+				event.preventDefault(); // Impede o foco de mudar
+				
+				// Insere a tabulação (ou espaços) no local do cursor
+				// const start = entrada_dados.selectionStart;
+				// const end = entrada_dados.selectionEnd;
+				
+				// entrada_dados.value = entrada_dados.value.substring(0, start) + "\t" + entrada_dados.value.substring(end);
+				
+				// // Posiciona o cursor após a tabulação inserida
+				// entrada_dados.selectionStart = entrada_dados.selectionEnd = start + 1;
+			}
 
 			if (botao_clicado !== 'CapsLock' && botao_clicado !== 'Shift') {
 				let esperado = texto_exercicio[posicao_digitada];
+				console.log("esperado"+esperado);
 				if (esperado === '⏎') esperado = '\n'; // mapeamento visual para funcional
 
-				if (botao_clicado === esperado || (botao_clicado === "Enter" && esperado === '\n')) {
+				if (esperado === '→') esperado = '\t';
+
+				if (botao_clicado === esperado 
+					|| (botao_clicado === "Enter" && esperado === '\n')
+					|| (botao_clicado === "Tab" && esperado === '\t')
+					|| (botao_clicado === "Tab" && esperado === '    ')
+				) {
+					console.log(botao_clicado);
 					document.querySelector("#texto_exercicio > span:nth-child(" + (posicao_digitada + 1) + ")").style.color = 'green';
 				} else {
+					console.log("errou:"+botao_clicado);
 					sucesso = 0;
 					document.querySelector("#texto_exercicio > span:nth-child(" + (posicao_digitada + 1) + ")").style.color = 'red';
 				}
