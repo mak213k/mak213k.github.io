@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ani: A Jornada do Além (Demo)</title>
+<style>
+  :root { --bg: #2b210f; --ui: #e6c98a; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: linear-gradient(#1b1207, #3b2812); color:var(--ui); display:flex; align-items:center; justify-content:center; height:100vh; }
+  #game-wrap { box-shadow: 0 8px 40px rgba(0,0,0,0.6); background: #111; padding:10px; border-radius:6px; }
+  canvas { image-rendering: pixelated; display:block; background: linear-gradient(#f7e4b5 0%, #e1c78f 70%); }
+  #ui { margin-top:8px; display:flex; gap:12px; align-items:center; justify-content:space-between; color:var(--ui); font-size:13px; }
+  #hud-left { display:flex; gap:12px; align-items:center; }
+  .heart { display:inline-block; color:#ff6b6b; }
+  #message { font-size:13px; color:#ffd; }
+  #overlay { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+  .panel { pointer-events:auto; background:rgba(0,0,0,0.7); padding:20px; border-radius:8px; max-width:760px; color:#fff; }
+  .btn { background:#c9a25a; color:#1b1207; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; font-weight:600; }
+  .small { font-size:13px; opacity:0.95; }
+  a { color:#ffd; }
+</style>
+</head>
+<body>
+<div id="game-wrap">
+  <canvas id="screen" width="960" height="384"></canvas>
+  <div id="ui">
+    <div id="hud-left">
+      <div id="lives">Vidas: <span id="hearts">❤❤❤</span></div>
+      <div id="torches">Tochas acesas: <span id="torchCount">0</span></div>
+      <div id="wave">Wave: <span id="waveNum">1</span></div>
+    </div>
+    <div id="message">Objetivo: Siga o caminho de Ani. Chegue ao portal dourado.</div>
+    <div id="controls" class="small">Controles: A/D ou ←→ = mover • Espaço = pular • E = interagir/acender tocha • F = usar Ankh</div>
+  </div>
+</div>
+
+<div id="overlay">
+  <div class="panel" id="panel-start">
+    <h2>Ani: A Jornada do Além — Demo</h2>
+    <p class="small">
+      Você controla <strong>Ani</strong>, seguindo o caminho descrito no Papiro de Ani.
+      Use a luz para revelar passagens e evitar criaturas do Duat. As tochas são
+      essenciais para progredir — acenda-as quando estiver próximo (pressione <strong>E</strong>).
+    </p>
+    <p class="small"><strong>Objetivo:</strong> atravessar o mapa e alcançar o portal dourado à direita.</p>
+    <p class="small">O jogo aumenta a dificuldade progressivamente — inimigos mais rápidos aparecerão com o tempo.</p>
+    <p style="margin-top:12px;">
+      <button class="btn" id="startBtn">Iniciar Jogo</button>
+      <button class="btn" id="howBtn">Como Jogar</button>
+    </p>
+    <p class="small" style="margin-top:8px;">Criado como demo: mecânicas, tilemap, iluminação dinâmica e progressão. Feito para rodar localmente.</p>
+  </div>
+
+  <div class="panel" id="panel-how" style="display:none;">
+    <h3>Como Jogar</h3>
+    <ul class="small">
+      <li><strong>Movimento:</strong> A/D ou ← → para mover, Shift para correr, Espaço para pular.</li>
+      <li><strong>Interagir (E):</strong> acende/apaga a tocha mais próxima (quando estiver perto).</li>
+      <li><strong>Usar item sagrado (F):</strong> ativa temporariamente um grande raio de luz centrado em Ani (Ankh).</li>
+      <li><strong>Luz:</strong> sem luz, áreas ficam escuras — inimigos tornam-se mais perigosos em trevas.</li>
+      <li><strong>Portal dourado:</strong> ao alcançá-lo você ganha (fim de demo).</li>
+    </ul>
+    <p style="margin-top:12px;"><button class="btn" id="backStart">Voltar</button></p>
+  </div>
+
+  <div class="panel" id="panel-win" style="display:none;">
+    <h2>Parabéns — você alcançou o portal!</h2>
+    <p class="small">Você completou a demo da jornada de Ani. Deseja jogar novamente ou exportar o mapa?</p>
+    <p style="margin-top:12px;">
+      <button class="btn" id="replay">Jogar Novamente</button>
+    </p>
+  </div>
+</div>
+
+<script>
+/*
+  Ani: A Jornada do Além - Demo
+  Single-file HTML/JS demo that implements:
+    - tilemap (30x12, tile 32px)
+    - ground/props/collision arrays (tile IDs)
+    - light/darkness with torch interactions
+    - enemies (serpentes + guardiões)
+    - progression (waves increase difficulty)
+    - player controls: A/D, arrows, Space, E, F
+    - portal tile to win
+
+  The art is procedural (drawn on canvas), using pixel-art style rectangles and simple shapes,
+  so there are no external asset dependencies.
+*/
+
+/* ------------------------------
+   Constants and tilemap data
+   ------------------------------ */
+const TILE = 32;
+const MAP_W = 30;
+const MAP_H = 12;
+const canvas = document.getElementById('screen');
+const ctx = canvas.getContext('2d');
+
+const heartEl = document.getElementById('hearts');
+const torchCountEl = document.getElementById('torchCount');
+const waveNumEl = document.getElementById('waveNum');
+
+let gameState = 'menu'; // menu, playing, win
+
+// Collision layer (1 = solid)
+const collision = [
+  // (12 rows, 30 columns) - derived from the JSON created earlier
+  // ... for brevity we paste same as earlier collision array flattened by rows
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
+  [1,1,1,1,1,1,1,0,0,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+];
+
+// ground layer (tile IDs to draw ground blocks). 0 = empty
+const ground = [
+  // rows top-to-bottom (12 arrays each length 30)
+  // we'll reuse the ground layer from earlier JSON (abbreviated)
+  // row0
+  new Array(30).fill(0),
+  new Array(30).fill(0),
+  new Array(30).fill(0),
+  new Array(30).fill(0),
+  new Array(30).fill(0),
+  (function(){ let a=new Array(30).fill(0); a[3]=3; a[10]=3; a[20]=3; return a; })(),
+  (function(){ let a=new Array(30).fill(0); a[7]=3; a[19]=3; return a; })(),
+  new Array(30).fill(0),
+  (function(){ let a=new Array(30).fill(0); a.fill(0); a[0]=5; a[1]=5; a[2]=5; a[3]=5; a[20]=6; a[21]=6; a[22]=6; return a; })(),
+  (function(){ let a=new Array(30).fill(0); for(let i=0;i<7;i++) a[i]=1; for(let i=15;i<22;i++) a[i]=1; return a; })(),
+  new Array(30).fill(1),
+  new Array(30).fill(1)
+];
+
+// props layer (4 = torch, 5=column, 9=ladder, 10=portal, 11=sphinx)
+const props = [
+  new Array(30).fill(0),
+  new Array(30).fill(0),
+  (function(){ let a=new Array(30).fill(0); a[22]=4; return a; })(),
+  (function(){ let a=new Array(30).fill(0); a[17]=4; a[22]=4; return a; })(),
+  (function(){ let a=new Array(30).fill(0); a[16]=4; a[24]=4; return a; })(),
+  (function(){ let a=new Array(30).fill(0); a[3]=4; a[10]=4; a[20]=4; return a; })(),
+  (function(){ let a=new Array(30).fill(0); a[7]=4; a[19]=4; return a; })(),
+  (function(){ let a=new Array(30).fill(0); a[2]=11; a[25]=11; return a; })(),
+  new Array(30).fill(0),
+  (function(){ let a=new Array(30).fill(0); a[2]=9; a[9]=4; a[10]=4; a[11]=4; a[15]=9; return a; })(),
+  (function(){ let a=new Array(30).fill(0); a[26]=10; return a; })(),
+  new Array(30).fill(0)
+];
+
+// Flatten helper
+function tileToIndex(x,y){ return y*MAP_W + x; }
+
+/* ------------------------------
+   Utils - collisions, tile checks
+   ------------------------------ */
+function isSolidTileAtXY(px, py) {
+  // px,py in pixels. We'll check point vs tile grid using collision layer
+  let tx = Math.floor(px / TILE);
+  let ty = Math.floor(py / TILE);
+  if (tx < 0 || tx >= MAP_W || ty < 0 || ty >= MAP_H) return true;
+  return collision[ty][tx] === 1;
+}
+function tileAt(x,y){
+  if (x<0||x>=MAP_W||y<0||y>=MAP_H) return 0;
+  return ground[y][x] || props[y][x] || 0;
+}
+
+/* ------------------------------
+   Input handling
+   ------------------------------ */
+const keys = {};
+window.addEventListener('keydown', (e)=>{ keys[e.key.toLowerCase()] = true; if (['arrowleft','arrowright','arrowup','arrowdown',' '].includes(e.key.toLowerCase())) e.preventDefault(); });
+window.addEventListener('keyup', (e)=>{ keys[e.key.toLowerCase()] = false; });
+
+/* ------------------------------
+   Game objects
+   ------------------------------ */
+const player = {
+  x: TILE*1.5, y: TILE*8 - 4, w: 18, h:28,
+  vx:0, vy:0, speed: 1.6, runMult:1.6, jumpPower:8,
+  onGround:false, lives:3, ankhActive:false, ankhTimer:0
+};
+
+let torches = []; // {x,y, lit}
+let enemies = []; // each: {x,y,type,vx,dir,spd,patrolRange}
+let wave = 1;
+let lastWaveTime = performance.now();
+let torchCount = 0;
+let portalPos = null;
+let spawnTimer = 0;
+let checkpoint = {x:player.x,y:player.y};
+
+/* ------------------------------
+   Initialize torches & portal from props layer
+   ------------------------------ */
+function initMap(){
+  torches = [];
+  enemies = [];
+  torchCount = 0;
+  portalPos = null;
+  for(let y=0;y<MAP_H;y++){
+    for(let x=0;x<MAP_W;x++){
+      const p = props[y][x];
+      if (p===4) {
+        torches.push({ x: x*TILE + TILE/2, y: y*TILE + TILE/2, lit: false });
+      } else if (p===10) {
+        portalPos = { x: x*TILE + TILE/2, y: y*TILE + TILE/2 };
+      } else if (p===11) {
+        // sphinx - spawn a guard nearby
+        enemies.push({ x: x*TILE + TILE/2, y: y*TILE + TILE/2 - 8, type:'guard', vx:0.8, dir:1, patrolRange:48 });
+      }
+    }
+  }
+}
+initMap();
+
+/* ------------------------------
+   Enemy spawn logic & difficulty
+   ------------------------------ */
+function spawnEnemy(){
+  // spawn serpent from left or right near darker areas
+  const side = Math.random() < 0.5 ? 'left' : 'right';
+  const spawnX = side === 'left' ? TILE*0.5 : (MAP_W*TILE) - TILE*0.5;
+  const spawnY = (7 + Math.floor(Math.random()*4))*TILE; // ground area
+  enemies.push({ x: spawnX, y: spawnY - 8, type:'serpent', vx: (side==='left'?0.6: -0.6) * (1 + (wave-1)*0.12), dir: side==='left'?1:-1, patrolRange:80 + wave*10 });
+}
+
+/* ------------------------------
+   Physics and collisions
+   ------------------------------ */
+function applyPhysics(dt){
+  // dt in seconds
+  // player controls
+  let accel = 0;
+  if (keys['a'] || keys['arrowleft']) accel -= 1;
+  if (keys['d'] || keys['arrowright']) accel += 1;
+  const running = keys['shift'] || false;
+  const spd = player.speed * (running ? player.runMult : 1);
+  player.vx = accel * spd * 60 * dt;
+
+  // Jump
+  if ((keys[' '] || keys['arrowup']) && player.onGround) {
+    player.vy = -player.jumpPower;
+    player.onGround = false;
+  }
+
+  // gravity
+  player.vy += 20 * dt;
+
+  // integrate
+  let newX = player.x + player.vx * 60 * dt;
+  let newY = player.y + player.vy;
+
+  // horizontal collision: check corners
+  const signX = Math.sign(player.vx) || 0;
+  if (signX !== 0){
+    const step = signX > 0 ? player.w/2 : -player.w/2;
+    const checkX = newX + step;
+    // check vertical extents top & bottom
+    if (isSolidAt(checkX, player.y - player.h/2 + 2) || isSolidAt(checkX, player.y + player.h/2 - 2)) {
+      // hit wall
+      while (!isSolidAt(newX + Math.sign(player.vx) * (player.w/2 - 1), player.y - player.h/2 + 2)
+          && !isSolidAt(newX + Math.sign(player.vx) * (player.w/2 - 1), player.y + player.h/2 - 2)) {
+        newX += Math.sign(player.vx) * 0.5; // nudge until collision (prevent tunneling)
+      }
+      player.vx = 0;
+    }
+  }
+
+  // vertical collision
+  const signY = Math.sign(player.vy) || 0;
+  if (signY !== 0){
+    const checkY = newY;
+    // check two horizontal points
+    const left = newX - player.w/2 + 2;
+    const right = newX + player.w/2 - 2;
+    if (player.vy > 0) {
+      // moving down
+      if (isSolidAt(left, checkY + player.h/2) || isSolidAt(right, checkY + player.h/2)) {
+        // land
+        player.onGround = true;
+        player.vy = 0;
+        newY = Math.floor((checkY + player.h/2) / TILE) * TILE - player.h/2 - 0.01;
+      } else player.onGround = false;
+    } else {
+      // moving up, hitting ceiling
+      if (isSolidAt(left, checkY - player.h/2) || isSolidAt(right, checkY - player.h/2)) {
+        player.vy = 0;
+        newY = Math.ceil((checkY - player.h/2) / TILE) * TILE + player.h/2 + 0.01;
+      }
+    }
+  }
+
+  player.x = newX;
+  player.y = newY;
+
+  // prevent falling below map
+  if (player.y > MAP_H*TILE + 100) {
+    // respawn at checkpoint
+    player.lives -= 1;
+    if (player.lives <=0) {
+      resetGame();
+      return;
+    } else {
+      player.x = checkpoint.x;
+      player.y = checkpoint.y;
+      player.vx = player.vy = 0;
+    }
+  }
+}
+
+function isSolidAt(px, py) {
+  // test a point px,py (pixels) for solidity using collision layer
+  if (px < 0 || py < 0) return true;
+  const tx = Math.floor(px / TILE);
+  const ty = Math.floor(py / TILE);
+  if (tx < 0 || tx >= MAP_W || ty < 0 || ty >= MAP_H) return true;
+  return collision[ty][tx] === 1;
+}
+
+/* ------------------------------
+   Drawing helpers - pixel-art style
+   ------------------------------ */
+function drawRect(x,y,w,h,fill,outline){
+  ctx.fillStyle = fill;
+  ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+  if (outline){
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(Math.round(x)+0.5, Math.round(y)+0.5, Math.round(w)-1, Math.round(h)-1);
+  }
+}
+
+function drawTile(x,y,tileID){
+  const px = x*TILE, py = y*TILE;
+  // draw simple variations by tileID
+  if (tileID === 1) {
+    // sand block
+    drawRect(px,py,TILE,TILE,'#e4c48a','#b6893b');
+    // hiero pips
+    ctx.fillStyle='#d1b07b';
+    for(let i=0;i<3;i++){
+      ctx.fillRect(px+4+i*8,py+TILE-8,2,4);
+    }
+  } else if (tileID===3) {
+    // stone platform small
+    drawRect(px,py+TILE*0.25,TILE,TILE*0.75,'#c6a16a','#8d6b3f');
+    ctx.fillStyle='#b89158';
+    ctx.fillRect(px+6,py+TILE*0.25+6,4,4);
+  } else if (tileID===5) {
+    // column base (taller)
+    drawRect(px,py- TILE, TILE, TILE*2,'#e7d1a0','#a87f45'); // occupy 2 tiles visually
+    // capital
+    ctx.fillStyle='#ffd98b';
+    ctx.fillRect(px+6,py- TILE +6,20,6);
+  } else if (tileID===6) {
+    drawRect(px,py,TILE,TILE,'#c0a475','#7f5d35');
+    ctx.fillStyle='#b0894f';
+    ctx.fillRect(px+4,py+4,8,4);
+  } else if (tileID===9) {
+    // ladder prop
+    drawRect(px+12,py,8,TILE,'#9b6f42');
+    ctx.fillStyle='#7d5c37';
+    ctx.fillRect(px+12,py+6,8,2);
+    ctx.fillRect(px+12,py+18,8,2);
+  } else if (tileID===10) {
+    // portal tile (gold)
+    drawRect(px,py,TILE,TILE,'#f4d36b','#a67b2b');
+    // inner glow ring
+    ctx.beginPath(); ctx.strokeStyle='#ffd66a'; ctx.lineWidth=2;
+    ctx.arc(px+TILE/2,py+TILE/2,10,0,Math.PI*2); ctx.stroke();
+  } else if (tileID===11) {
+    // sphinx decorative
+    drawRect(px,py+8,TILE,TILE*0.8,'#d2a76a','#8d6b3f');
+    ctx.fillStyle='#ffd'; ctx.fillRect(px+6,py+10,4,4);
+  }
+}
+
+/* draw props like torches */
+function drawProp(prop){
+  const px = prop.x - TILE/2;
+  const py = prop.y - TILE/2;
+  // small base
+  drawRect(px+12,py+18,8,8,'#7b4f29','#4a2d18');
+  // torch stick
+  drawRect(px+14,py+6,4,12,'#9b6f42');
+  // flame
+  if (prop.lit){
+    // animated flame
+    const t = performance.now()/180;
+    const r = 6 + Math.sin(t)*1.2;
+    const grad = ctx.createRadialGradient(prop.x, prop.y-6, 1, prop.x, prop.y-6, r);
+    grad.addColorStop(0,'#fff3b8'); grad.addColorStop(0.3,'#ffd36a'); grad.addColorStop(1,'rgba(255,120,30,0.05)');
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(prop.x, prop.y-6, r, 0, Math.PI*2); ctx.fill();
+  } else {
+    // unlit small ember
+    drawRect(px+14,py+22,4,4,'#4b3621');
+  }
+}
+
+/* draw enemy simple sprites */
+function drawEnemy(e){
+  const ex = e.x - 12, ey = e.y - 18;
+  if (e.type === 'serpent'){
+    // simple snake coil
+    drawRect(ex, ey+8, 24, 12, '#6a8c50', '#3f5f32');
+    // head
+    drawRect(ex+18, ey, 6, 8, '#6a8c50');
+    // eye
+    ctx.fillStyle = '#fff'; ctx.fillRect(ex+20,ey+2,2,2);
+  } else if (e.type === 'guard'){
+    // anubis-like protector
+    drawRect(ex,ey,24,32,'#9b6f42','#5b3f27');
+    // head mask
+    ctx.fillStyle = '#1e1e1e'; ctx.fillRect(ex+6,ey-8,12,10);
+  }
+}
+
+/* draw player (Ani) */
+function drawPlayer(){
+  const cx = player.x - player.w/2;
+  const cy = player.y - player.h/2;
+  // body
+  drawRect(cx, cy+6, player.w, player.h-6, '#c66d35', '#7a3f20');
+  // kilt
+  drawRect(cx, cy+player.h-10, player.w, 8, '#fff', '#bdbdbd');
+  // head
+  drawRect(cx+4, cy-6, player.w-8, 12, '#e3a06a', '#b07044');
+  // simple eye
+  ctx.fillStyle='#000'; ctx.fillRect(cx+10, cy-2, 2, 2);
+  // Ankh glow if active
+  if (player.ankhActive){
+    const grad = ctx.createRadialGradient(player.x, player.y - 18, 4, player.x, player.y - 18, 48);
+    grad.addColorStop(0, 'rgba(255,240,180,0.9)'); grad.addColorStop(0.5,'rgba(255,180,60,0.25)'); grad.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(player.x, player.y - 18, 48, 0, Math.PI*2); ctx.fill();
+  }
+}
+
+/* ------------------------------
+   Light mask & rendering
+   ------------------------------ */
+function renderLighting(){
+  // darken whole screen then cut holes for lights: use global composite operations
+  // first draw the scene normally to ctx; then overlay darkness
+  // create a temporary canvas to hold darkness mask for blending (for smoother radial)
+  const dark = document.createElement('canvas');
+  dark.width = canvas.width; dark.height = canvas.height;
+  const dctx = dark.getContext('2d');
+
+  // fill darkness
+  dctx.fillStyle = 'rgba(3,3,3,0.88)';
+  dctx.fillRect(0,0,dark.width,dark.height);
+
+  // reveal areas near lit torches and near player (if Ankh active)
+  // we will cut circles (transparent) using 'destination-out'
+  dctx.globalCompositeOperation = 'destination-out';
+  // player small personal light (always small)
+  let pr = 80;
+  dctx.beginPath();
+  dctx.arc(player.x, player.y - 6, pr, 0, Math.PI*2);
+  dctx.fill();
+
+  // if Ankh used: larger radius
+  if (player.ankhActive) {
+    dctx.beginPath();
+    dctx.arc(player.x, player.y - 6, 180, 0, Math.PI*2);
+    dctx.fill();
+  }
+
+  // torches
+  for(const t of torches){
+    if (t.lit) {
+      // radius depends on whether torch recently lit (subtle flicker)
+      const r = 140 + Math.sin(performance.now()/180 + (t.x%50))*10;
+      dctx.beginPath(); dctx.arc(t.x, t.y - 6, r, 0, Math.PI*2); dctx.fill();
+    }
+  }
+
+  // composite dark over main canvas
+  ctx.drawImage(dark, 0, 0);
+}
+
+/* ------------------------------
+   Game loop and rendering
+   ------------------------------ */
+let lastTime = performance.now();
+function gameLoop(now){
+  const dt = Math.min(0.033, (now - lastTime)/1000);
+  lastTime = now;
+
+  if (gameState === 'playing') {
+    // update
+    applyPhysics(dt);
+    updateEnemies(dt);
+    updateWaves(now);
+    handleInteractions();
+    // update UI
+    heartEl.textContent = '❤'.repeat(player.lives);
+    torchCountEl.textContent = torches.filter(t=>t.lit).length;
+    waveNumEl.textContent = wave;
+
+    // camera: simple clamp so player visible
+    const camX = Math.max(0, Math.min(player.x - canvas.width/2, MAP_W*TILE - canvas.width));
+    ctx.setTransform(1,0,0,1,-camX,0);
+  }
+
+  // draw scene (tiles, props, player, enemies)
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // background sky gradient
+  ctx.save();
+  const sky = ctx.createLinearGradient(0,0,0,canvas.height);
+  sky.addColorStop(0,'#f7e4b5'); sky.addColorStop(1,'#e1c78f');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0,0,MAP_W*TILE, MAP_H*TILE);
+  ctx.restore();
+
+  // draw ground tiles
+  for(let y=0;y<MAP_H;y++){
+    for(let x=0;x<MAP_W;x++){
+      const id = ground[y][x];
+      if (id) drawTile(x,y,id);
+      else {
+        // subtle floor line for empty
+        ctx.fillStyle = '#e9d6aa';
+        ctx.fillRect(x*TILE, y*TILE+TILE-4, TILE, 3);
+      }
+    }
+  }
+
+  // props
+  for(const p of torches){
+    drawProp(p);
+  }
+  for(let y=0;y<MAP_H;y++){
+    for(let x=0;x<MAP_W;x++){
+      const id = props[y][x];
+      if (id && id !== 4 && id !== 11 && id !== 10 && id !== 9) drawTile(x,y,id);
+      // ladder drawn as tile 9 in ground earlier
+    }
+  }
+  // draw sphinx & portal special
+  for(let y=0;y<MAP_H;y++){
+    for(let x=0;x<MAP_W;x++){
+      const id = props[y][x];
+      if (id === 11) drawTile(x,y,11);
+      if (id === 10) drawTile(x,y,10);
+    }
+  }
+
+  // enemies
+  for(const e of enemies) drawEnemy(e);
+
+  // player
+  drawPlayer();
+
+  // lighting overlay (darkness)
+  renderLighting();
+
+  // restore transform for UI
+  ctx.setTransform(1,0,0,1,0,0);
+
+  // HUD drawn by DOM, so done
+
+  if (gameState === 'playing' && portalPos){
+    // check reach portal
+    const dx = Math.abs(player.x - portalPos.x);
+    const dy = Math.abs(player.y - portalPos.y);
+    if (dx < TILE && dy < TILE){
+      // win
+      showWin();
+    }
+  }
+
+  requestAnimationFrame(gameLoop);
+}
+
+/* ------------------------------
+   Enemy update & collisions with player
+   ------------------------------ */
+function updateEnemies(dt){
+  for(const e of enemies){
+    if (e.type === 'serpent'){
+      e.x += e.vx;
+      // bounce on collision against solid or when reaching edge of map
+      if (isSolidAt(e.x + Math.sign(e.vx)*12, e.y) || e.x < 10 || e.x > MAP_W*TILE - 10) {
+        e.vx *= -1; e.dir *= -1;
+      }
+    } else if (e.type === 'guard'){
+      // simple back-and-forth
+      e.x += e.vx * e.dir;
+      if (Math.abs(e.x - (Math.round(e.x / TILE)*TILE)) > e.patrolRange) e.dir *= -1;
+    }
+
+    // collision with player
+    if (Math.abs(e.x - player.x) < 20 && Math.abs(e.y - player.y) < 20){
+      // if player in lit area, enemy is less harmful: just bounce or push back
+      const inLight = isInLitZone(player.x, player.y);
+      if (!inLight){
+        player.lives -= 1;
+        // push back
+        player.x -= 32 * Math.sign(e.x - player.x);
+        if (player.lives <= 0) {
+          resetGame();
+          return;
+        }
+      } else {
+        // harmless: knock enemy away
+        e.x += (e.x > player.x? 30 : -30);
+      }
+    }
+  }
+}
+
+/* ------------------------------
+   Light checks & interactions
+   ------------------------------ */
+function isInLitZone(px, py){
+  // if any torch lit within radius or player has ankhActive
+  if (player.ankhActive) return true;
+  for(const t of torches){
+    if (t.lit){
+      const dx = t.x - px, dy = t.y - py;
+      if (dx*dx + dy*dy < 140*140) return true;
+    }
+  }
+  // also small ambient around player
+  return false;
+}
+
+function handleInteractions(){
+  // E key: interact with nearest torch within range
+  if (keys['e'] && !keys._eHandled) {
+    keys._eHandled = true;
+    // find nearest torch
+    let nearest = null; let nd = 999999;
+    for(const t of torches){
+      const d = Math.hypot(player.x - t.x, player.y - t.y);
+      if (d < nd) { nearest = t; nd = d; }
+    }
+    if (nearest && nd < 60){
+      nearest.lit = !nearest.lit;
+      // small reward: if lit near checkpoint and not set, update
+      if (nearest.lit) {
+        checkpoint.x = player.x; checkpoint.y = player.y;
+      }
+    }
+  }
+  if (!keys['e']) keys._eHandled = false;
+
+  // F key: Ankh (temporary large light)
+  if (keys['f'] && !keys._fHandled) {
+    keys._fHandled = true;
+    player.ankhActive = true; player.ankhTimer = performance.now();
+  }
+  if (!keys['f']) keys._fHandled = false;
+
+  // manage ankh timer
+  if (player.ankhActive){
+    if (performance.now() - player.ankhTimer > 6000) player.ankhActive = false;
+  }
+}
+
+/* ------------------------------
+   Waves and difficulty
+   ------------------------------ */
+function updateWaves(now){
+  // spawn periodic enemies, increase wave every 18s
+  if (now - lastWaveTime > 18000) {
+    wave++;
+    lastWaveTime = now;
+  }
+  // spawn enemies more frequently with wave
+  spawnTimer += 1 + wave*0.02;
+  if (spawnTimer > 80) {
+    spawnTimer = 0;
+    spawnEnemy();
+  }
+}
+
+/* ------------------------------
+   Reset & Win handling
+   ------------------------------ */
+function resetGame(){
+  // reset to checkpoint or start
+  player.lives = 3;
+  player.x = TILE*1.5; player.y = TILE*8 - 4;
+  player.vx = player.vy = 0;
+  initMap();
+  wave = 1;
+  lastWaveTime = performance.now();
+  enemies = [];
+  torches.forEach(t=>t.lit=false);
+  player.ankhActive = false;
+}
+
+function showWin(){
+  gameState = 'win';
+  document.getElementById('panel-start').style.display='none';
+  document.getElementById('panel-how').style.display='none';
+  document.getElementById('panel-win').style.display='block';
+  document.getElementById('overlay').style.pointerEvents='auto';
+}
+
+/* ------------------------------
+   Setup interactions and start
+   ------------------------------ */
+document.getElementById('startBtn').addEventListener('click', ()=>{
+  document.getElementById('overlay').style.pointerEvents='none';
+  document.getElementById('panel-start').style.display='none';
+  gameState = 'playing';
+  lastTime = performance.now();
+});
+document.getElementById('howBtn').addEventListener('click', ()=>{
+  document.getElementById('panel-start').style.display='none';
+  document.getElementById('panel-how').style.display='block';
+});
+document.getElementById('backStart').addEventListener('click', ()=>{
+  document.getElementById('panel-how').style.display='none';
+  document.getElementById('panel-start').style.display='block';
+});
+document.getElementById('replay').addEventListener('click', ()=>{
+  document.getElementById('panel-win').style.display='none';
+  document.getElementById('panel-start').style.display='block';
+  document.getElementById('overlay').style.pointerEvents='auto';
+  resetGame();
+  gameState='menu';
+});
+
+/* ------------------------------
+   Initialize torches array from props
+   ------------------------------ */
+function buildTorches(){
+  torches = [];
+  for(let y=0;y<MAP_H;y++){
+    for(let x=0;x<MAP_W;x++){
+      if (props[y][x]===4){
+        torches.push({ x:x*TILE + TILE/2, y:y*TILE + TILE/2, lit:false });
+      }
+    }
+  }
+}
+buildTorches();
+
+/* ------------------------------
+   Start main loop
+   ------------------------------ */
+requestAnimationFrame(gameLoop);
+
+/* ------------------------------
+   Extras: click to toggle torch for convenience
+   ------------------------------ */
+canvas.addEventListener('click', (ev)=>{
+  // convert screen coords to world coords
+  const rect = canvas.getBoundingClientRect();
+  const sx = ev.clientX - rect.left;
+  const sy = ev.clientY - rect.top;
+  // worldX = sx + camX
+  const camX = Math.max(0, Math.min(player.x - canvas.width/2, MAP_W*TILE - canvas.width));
+  const wx = sx + camX;
+  const wy = sy;
+  // toggle nearest torch if within 40 px
+  let nearest=null; let nd=99999;
+  for(const t of torches){
+    const d = Math.hypot(wx - t.x, wy - t.y);
+    if (d < nd){ nd = d; nearest = t; }
+  }
+  if (nearest && nd < 60) nearest.lit = !nearest.lit;
+});
+
+</script>
+</body>
+</html>
