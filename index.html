@@ -1,50 +1,238 @@
 <!doctype html>
-<html>
-  <head>
-    <title>Menu de exemplos </title>
-  </head>
-  <body>
-		<a href="simuladores/estados_quanticos/index.html" target="_blank" >
-			<p style="font-family:arial;font-size:0.75em"><li>Simulação de estados quânticos.</li></p>
-		</a>
-		<a href="NasaAppSpaceChallenge2023_/index.html" target="_blank" >
-			<p style="font-family:arial;font-size:0.75em"><li>Nasa App Space Challenge 2023 Project.</li></p>
-		</a>
-		<a href="simuladores/universo/solar_system.html" target="_blank" >
-			<p style="font-family:arial;font-size:0.75em"><li>Solar system Project.</li></p>
-		</a>
-	  	<a href="treino_digitacao/teclado.html" target="_blank" >
-			<p style="font-family:arial;font-size:0.75em"><li>Treino de digitação.</li></p>
-		</a>
-		<a href="tetris/index.html" target="_blank" >
-			<p style="font-family:arial;font-size:0.75em"><li>Jogo clássico Tetris</li></p>
-		</a>
-		<a href="copia_instagram/initialPageInstagram.html" target="_blank" >
-			<p style="font-family:arial;font-size:0.75em"><li>Cópia da página login do Instagram</li></p>
-		</a>
-		<a href="netflix_copia/index.html" target="_blank" >
-			<p style="font-family:arial;font-size:0.75em"><li>Cópia da página index do Netflix</li></p>
-		</a>
-		<a href="primeiroJogoDeNaves/index.html" target="_blank" >
-			<p style="font-family:arial;font-size:0.75em"><li>Primeiro jogo de nave</li></p>
-		</a>
-		<a href="jogo_da_memoria/index.html" target="_blank" >
-			<p style="font-family:arial;font-size:0.75em"><li>Jogo da Memória</li></p>
-		</a>
-		<a href="dino_game/index.html" target="_blank" >
-			<p style="font-family:arial;font-size:0.75em"><li>Jogo do Dinossauro</li></p>
-		</a>
-		<a href="jogo_da_memoria_bleach/index.html" target="_blank" >
-			<p style="font-family:arial;font-size:0.75em"><li>Jogo da memória do Bleach</li></p>
-		</a>
-		<a href="jogo_da_velha/index.html" target="_blank" >
-			<p style="font-family:arial;font-size:0.75em"><li>Jogo da velha feito em Javascript simples</li></p>
-		</a>
-		<a href="space_shooter/index.html" target="_blank" >
-			<p style="font-family:arial;font-size:0.75em"><li>Space shooters(jogo de atirar em aliens) Javascript simples</li></p>
-		</a>
-		<a href="controllers-rgb-and-scale-in-pure-javascript/index.html" target="_blank" >
-			<p style="font-family:arial;font-size:0.75em"><li>Fogo do doom</li></p>
-		</a>
-  </body>
+<html lang="pt-br">
+<head><script src="https://myhub.ia.br/canvas-vendor/tailwind.js"></script>
+<meta charset="UTF-8">
+<title>Portfólio de Projetos</title>
+<style>
+  :root{
+    --bg:#0b0e14;
+    --bg-card:#131722;
+    --border:#242b3d;
+    --accent:#5eead4;
+    --accent2:#818cf8;
+    --text:#e5e7eb;
+    --muted:#8b95a7;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:radial-gradient(circle at 20% 0%, #1a2030 0%, var(--bg) 60%);
+    color:var(--text);
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    min-height:100vh;
+    padding:40px 20px 80px;
+  }
+  header{
+    max-width:1100px;
+    margin:0 auto 50px;
+    text-align:center;
+  }
+  header h1{
+    font-size:2.4rem;
+    font-weight:700;
+    background:linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    margin-bottom:10px;
+  }
+  header p{
+    color:var(--muted);
+    font-size:1.05rem;
+    max-width:620px;
+    margin:0 auto;
+    line-height:1.5;
+  }
+  .badges{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:20px;
+    flex-wrap:wrap;
+  }
+  .badge{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    color:var(--accent);
+    font-size:0.78rem;
+    padding:5px 12px;
+    border-radius:20px;
+    font-weight:600;
+  }
+  .grid{
+    max-width:1100px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+    gap:22px;
+  }
+  .card{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px;
+    text-decoration:none;
+    color:var(--text);
+    position:relative;
+    overflow:hidden;
+    transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+    display:flex;
+    flex-direction:column;
+    min-height:150px;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    top:0; left:0; right:0; height:3px;
+    background:linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity:0;
+    transition:opacity .25s ease;
+  }
+  .card:hover{
+    transform:translateY(-6px);
+    border-color:var(--accent);
+    box-shadow:0 12px 30px -10px rgba(94,234,212,0.25);
+  }
+  .card:hover::before{
+    opacity:1;
+  }
+  .icon{
+    font-size:1.8rem;
+    margin-bottom:14px;
+  }
+  .card h3{
+    font-size:1.05rem;
+    font-weight:600;
+    margin-bottom:8px;
+    line-height:1.3;
+  }
+  .tag{
+    margin-top:auto;
+    align-self:flex-start;
+    font-size:0.7rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    padding:4px 10px;
+    border-radius:6px;
+    color:#0b0e14;
+  }
+  .tag.sim{background:var(--accent);}
+  .tag.game{background:#fbbf24;}
+  .tag.clone{background:#f472b6;}
+  .tag.tool{background:var(--accent2);}
+
+  footer{
+    text-align:center;
+    color:var(--muted);
+    margin-top:60px;
+    font-size:0.85rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Projetos & Experimentos</h1>
+  <p>Coleção de projetos práticos em JavaScript, simulações, jogos e clones de interfaces — desenvolvidos para explorar lógica, física e UI/UX.</p>
+  <div class="badges">
+    <span class="badge">JavaScript</span>
+    <span class="badge">HTML5 / CSS3</span>
+    <span class="badge">Canvas / WebGL</span>
+    <span class="badge">Game Dev</span>
+  </div>
+</header>
+
+<div class="grid">
+
+  <a class="card" href="simuladores/estados_quanticos/index.html" target="_blank">
+    <div class="icon">⚛️</div>
+    <h3>Simulação de Estados Quânticos</h3>
+    <span class="tag sim">Simulação</span>
+  </a>
+
+  <a class="card" href="NasaAppSpaceChallenge2023_/index.html" target="_blank">
+    <div class="icon">🚀</div>
+    <h3>NASA App Space Challenge 2023</h3>
+    <span class="tag tool">Projeto</span>
+  </a>
+
+  <a class="card" href="simuladores/universo/solar_system.html" target="_blank">
+    <div class="icon">🪐</div>
+    <h3>Solar System Project</h3>
+    <span class="tag sim">Simulação</span>
+  </a>
+
+  <a class="card" href="treino_digitacao/teclado.html" target="_blank">
+    <div class="icon">⌨️</div>
+    <h3>Treino de Digitação</h3>
+    <span class="tag tool">Ferramenta</span>
+  </a>
+
+  <a class="card" href="tetris/index.html" target="_blank">
+    <div class="icon">🧩</div>
+    <h3>Tetris Clássico</h3>
+    <span class="tag game">Jogo</span>
+  </a>
+
+  <a class="card" href="copia_instagram/initialPageInstagram.html" target="_blank">
+    <div class="icon">📸</div>
+    <h3>Clone Login do Instagram</h3>
+    <span class="tag clone">Clone de UI</span>
+  </a>
+
+  <a class="card" href="netflix_copia/index.html" target="_blank">
+    <div class="icon">🎬</div>
+    <h3>Clone Página Inicial Netflix</h3>
+    <span class="tag clone">Clone de UI</span>
+  </a>
+
+  <a class="card" href="primeiroJogoDeNaves/index.html" target="_blank">
+    <div class="icon">🛸</div>
+    <h3>Primeiro Jogo de Naves</h3>
+    <span class="tag game">Jogo</span>
+  </a>
+
+  <a class="card" href="jogo_da_memoria/index.html" target="_blank">
+    <div class="icon">🃏</div>
+    <h3>Jogo da Memória</h3>
+    <span class="tag game">Jogo</span>
+  </a>
+
+  <a class="card" href="dino_game/index.html" target="_blank">
+    <div class="icon">🦖</div>
+    <h3>Jogo do Dinossauro</h3>
+    <span class="tag game">Jogo</span>
+  </a>
+
+  <a class="card" href="jogo_da_memoria_bleach/index.html" target="_blank">
+    <div class="icon">🗡️</div>
+    <h3>Jogo da Memória — Bleach</h3>
+    <span class="tag game">Jogo</span>
+  </a>
+
+  <a class="card" href="jogo_da_velha/index.html" target="_blank">
+    <div class="icon">❌</div>
+    <h3>Jogo da Velha (JS Puro)</h3>
+    <span class="tag game">Jogo</span>
+  </a>
+
+  <a class="card" href="space_shooter/index.html" target="_blank">
+    <div class="icon">👽</div>
+    <h3>Space Shooter</h3>
+    <span class="tag game">Jogo</span>
+  </a>
+
+  <a class="card" href="controllers-rgb-and-scale-in-pure-javascript/index.html" target="_blank">
+    <div class="icon">🔥</div>
+    <h3>Fogo do Doom (RGB & Scale)</h3>
+    <span class="tag tool">Experimento Visual</span>
+  </a>
+
+</div>
+
+<footer>
+  Desenvolvido com HTML, CSS e JavaScript puro.
+</footer>
+
+</body>
 </html>
