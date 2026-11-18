@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flashcards TRF3 – Legislação</title>
+<style>
+  :root{
+    --bg:#f6f4ef; --surface:#ffffff; --ink:#1d2430; --muted:#5d6675; --line:#e2ded4;
+    --accent:#1f4e79; --accent-ink:#ffffff; --accent-soft:#e6eef6;
+    --ok:#2e7d4f; --ok-soft:#e5f3ea; --bad:#b3412e; --bad-soft:#f8e7e3;
+    --shadow:0 1px 2px rgba(20,25,35,.06),0 8px 24px rgba(20,25,35,.06);
+    --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#14171c; --surface:#1c2027; --ink:#e7e9ee; --muted:#9aa3b2; --line:#2c323c;
+      --accent:#7fb0e0; --accent-ink:#0e1a26; --accent-soft:#1f2c3a;
+      --ok:#6cc08f; --ok-soft:#183026; --bad:#e58b78; --bad-soft:#3a201b;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+  .wrap{max-width:860px;margin:0 auto;padding:24px 18px 48px}
+  header h1{font-size:1.45rem;margin:0 0 4px;letter-spacing:-.01em}
+  header p{margin:0;color:var(--muted);font-size:.95rem}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:18px;margin-top:18px}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+  label.field{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--muted);font-weight:600}
+  input[type=number]{width:120px;padding:10px 12px;font-size:1.05rem;border:1px solid var(--line);
+    border-radius:10px;background:var(--bg);color:var(--ink)}
+  input[type=number]:focus{outline:2px solid var(--accent);outline-offset:1px}
+  button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);
+    background:var(--surface);color:var(--ink);padding:10px 16px;font-weight:600}
+  button:hover{border-color:var(--accent)}
+  button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  button.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+  button.bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+  button.link{background:none;border:none;color:var(--accent);padding:4px 6px;font-weight:600}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .quick{display:flex;gap:6px;flex-wrap:wrap}
+  .quick button{padding:8px 12px;font-size:.9rem}
+  .temas-head{display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px}
+  .temas-head strong{font-size:.85rem;color:var(--muted)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);
+    border-radius:999px;font-size:.85rem;cursor:pointer;user-select:none;background:var(--bg)}
+  .chip input{accent-color:var(--accent);margin:0}
+  .chip .n{color:var(--muted);font-variant-numeric:tabular-nums}
+  .chip.on{background:var(--accent-soft);border-color:var(--accent)}
+  .hint{color:var(--muted);font-size:.85rem;margin-top:10px}
+  .status{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+    font-size:.9rem;color:var(--muted);margin-top:22px}
+  .score{display:flex;gap:14px;font-variant-numeric:tabular-nums}
+  .score .o{color:var(--ok);font-weight:700}.score .x{color:var(--bad);font-weight:700}
+  .bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:8px}
+  .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+  .card{perspective:1400px;margin-top:14px;cursor:pointer}
+  .inner{position:relative;display:grid;min-height:300px;transition:transform .45s cubic-bezier(.2,.7,.2,1);transform-style:preserve-3d}
+  .card.flipped .inner{transform:rotateY(180deg)}
+  .face{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:26px 26px 22px;display:flex;flex-direction:column}
+  .face.back{transform:rotateY(180deg);border-top:4px solid var(--accent)}
+  .tag{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700}
+  .text{font-size:1.2rem;line-height:1.55;margin:auto 0;padding:18px 0;white-space:pre-line;text-align:left}
+  .tipos{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+  .card.mc .text{margin:0;padding:14px 0 10px;font-size:1.08rem}
+  .alts{display:flex;flex-direction:column;gap:8px;margin:0 0 14px}
+  .alt{display:flex;gap:10px;align-items:flex-start;text-align:left;font-weight:500;padding:10px 12px;line-height:1.45;background:var(--bg)}
+  .alt b{flex:0 0 auto;color:var(--accent)}
+  .alt.certa{background:var(--ok-soft);border-color:var(--ok)}
+  .alt.certa b{color:var(--ok)}
+  .alt.errada{background:var(--bad-soft);border-color:var(--bad)}
+  .alt.errada b{color:var(--bad)}
+  .alts.feito .alt{cursor:default}
+  .enun{white-space:pre-line;color:var(--muted);font-size:.9rem;margin-top:10px}
+  .veredito{font-weight:700;margin:12px 0 6px}
+  .veredito.o{color:var(--ok)}.veredito.x{color:var(--bad)}
+  .coment{list-style:none;margin:6px 0 12px;padding:0;display:flex;flex-direction:column;gap:9px;font-size:.95rem}
+  .coment li{border-left:3px solid var(--line);padding:2px 0 2px 10px}
+  .coment li.ok{border-left-color:var(--ok)}
+  .coment li .t{display:block;color:var(--muted);font-size:.88rem}
+  .coment li.ok .t{color:var(--ink)}
+  .face.back .text{font-size:1.08rem}
+  .foot{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem}
+  .actions{display:flex;justify-content:space-between;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .actions .mid{display:flex;gap:10px}
+  .kbd{font-size:.8rem;color:var(--muted);text-align:center;margin-top:12px}
+  kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;font-size:.75rem;background:var(--surface)}
+  .end{text-align:center;padding:30px 18px}
+  .end .big{font-size:2.4rem;font-weight:800;margin:6px 0}
+  .end .btns{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .hidden{display:none!important}
+  .err{color:var(--bad);font-weight:600}
+  @media (max-width:560px){ .actions .mid{order:-1;width:100%} .actions .mid button{flex:1} .actions>button{flex:1} .text{font-size:1.08rem} .inner{min-height:340px} .face{padding:20px} }
+  @media (prefers-reduced-motion: reduce){ .inner{transition:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Flashcards · Legislação TRF3</h1>
+    <p><span id="total">…</span> questões sobre as normas do edital (TI): múltipla escolha no estilo VUNESP, com comentário de cada alternativa, e flashcards diretos.</p>
+  </header>
+
+  <section class="panel" id="setup">
+    <div class="row">
+      <label class="field">Quantos flashcards?
+        <input type="number" id="qtd" min="1" value="20" inputmode="numeric">
+      </label>
+      <div class="quick" aria-label="Atalhos de quantidade">
+        <button type="button" data-q="10">10</button>
+        <button type="button" data-q="20">20</button>
+        <button type="button" data-q="50">50</button>
+        <button type="button" data-q="100">100</button>
+        <button type="button" data-q="all">Todas</button>
+      </div>
+      <button type="button" class="primary" id="sortear">Sortear flashcards</button>
+    </div>
+    <div class="temas-head"><strong>Tipo de questão</strong></div>
+    <div class="tipos" id="tipos">
+      <label class="chip"><input type="radio" name="tipo" value="todas"> <span>Todas</span> <span class="n" id="nt_todas"></span></label>
+      <label class="chip"><input type="radio" name="tipo" value="direta"> <span>Flashcards diretos</span> <span class="n" id="nt_direta"></span></label>
+      <label class="chip"><input type="radio" name="tipo" value="vunesp" checked> <span>Múltipla escolha (estilo VUNESP)</span> <span class="n" id="nt_vunesp"></span></label>
+    </div>
+    <div class="temas-head">
+      <strong>Temas incluídos no sorteio</strong>
+      <span><button type="button" class="link" id="todos">Marcar todos</button><button type="button" class="link" id="nenhum">Limpar</button></span>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="hint" id="disp"></div>
+  </section>
+
+  <section id="study" class="hidden">
+    <div class="status">
+      <span id="pos">Cartão 1 de 1</span>
+      <span class="score">Acertos <span class="o" id="ok">0</span> · Erros <span class="x" id="bad">0</span></span>
+      <button type="button" class="link" id="novo">Novo sorteio</button>
+    </div>
+    <div class="bar"><i id="prog"></i></div>
+
+    <div class="card" id="card" tabindex="0" role="button" aria-label="Virar cartão">
+      <div class="inner">
+        <div class="face front">
+          <div class="tag" id="tagF"></div>
+          <div class="text" id="pergunta"></div>
+          <div class="alts hidden" id="alts"></div>
+          <div class="foot"><span id="footL">Pergunta</span><span id="footR">Toque para ver a resposta</span></div>
+        </div>
+        <div class="face back">
+          <div class="tag" id="tagB"></div>
+          <div class="text" id="resposta"></div>
+          <div class="hidden" id="mcBack"></div>
+          <div class="foot"><span>Resposta</span><span id="qid"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="button" id="prev">← Anterior</button>
+      <div class="mid">
+        <button type="button" class="bad" id="errei">Errei</button>
+        <button type="button" class="ok" id="acertei">Acertei</button>
+      </div>
+      <button type="button" id="next">Próximo →</button>
+    </div>
+    <div class="kbd"><kbd>Espaço</kbd> vira · <kbd>←</kbd> <kbd>→</kbd> navega · <kbd>A</kbd>–<kbd>E</kbd> responde (múltipla escolha) · <kbd>1</kbd> errei · <kbd>2</kbd> acertei (flashcards)</div>
+  </section>
+
+  <section id="fim" class="panel end hidden">
+    <div>Rodada concluída</div>
+    <div class="big" id="pct">0%</div>
+    <div id="resumo"></div>
+    <div class="btns">
+      <button type="button" class="bad" id="revisar">Revisar as que errei</button>
+      <button type="button" id="refazer">Refazer esta rodada</button>
+      <button type="button" class="primary" id="novo2">Novo sorteio</button>
+    </div>
+  </section>
+</div>
+
+<script src="questoes.js"></script>
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var BANCO = [], TEMAS = [], deck = [], i = 0, marks = {}, escolhas = {};
+  var LET = 'ABCDE';
+
+  function store(k, v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k, v); }catch(e){ return null; } }
+
+  function rnd(n){
+    if (window.crypto && crypto.getRandomValues){ var a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; }
+    return Math.floor(Math.random()*n);
+  }
+  function shuffle(arr){ for (var k = arr.length-1; k > 0; k--){ var j = rnd(k+1), t = arr[k]; arr[k] = arr[j]; arr[j] = t; } return arr; }
+
+  function selecionados(){
+    return Array.prototype.map.call(document.querySelectorAll('#chips input:checked'), function(c){ return c.value; });
+  }
+  function tipoSel(){ var r = document.querySelector('#tipos input:checked'); return r ? r.value : 'todas'; }
+  function pool(){
+    var s = selecionados(), t = tipoSel();
+    return BANCO.filter(function(q){ return s.indexOf(q.lei) !== -1 && (t === 'todas' || q.tipo === t); });
+  }
+  function atualizaDisp(){
+    var n = pool().length, qtd = $('qtd');
+    qtd.max = Math.max(1, n);
+    $('disp').textContent = n + ' perguntas disponíveis nos temas marcados.';
+    $('sortear').disabled = n === 0;
+    document.querySelectorAll('#chips .chip, #tipos .chip').forEach(function(ch){ ch.classList.toggle('on', ch.querySelector('input').checked); });
+    try{ store('trf3_temas_v2', JSON.stringify(selecionados())); store('trf3_tipo', tipoSel()); }catch(e){}
+  }
+
+  function montaChips(){
+    var cont = {};
+    BANCO.forEach(function(q){ if(!(q.lei in cont)){ cont[q.lei]=0; TEMAS.push(q.lei); } cont[q.lei]++; });
+    var salvos = null; try{ salvos = JSON.parse(store('trf3_temas_v2') || 'null'); }catch(e){}
+    TEMAS.sort(function(a,b){ return a.localeCompare(b, 'pt-BR', {numeric: true}); });
+    var tc = {todas: BANCO.length, direta: 0, vunesp: 0};
+    BANCO.forEach(function(q){ if(q.tipo in tc) tc[q.tipo]++; });
+    Object.keys(tc).forEach(function(k){ $('nt_'+k).textContent = tc[k]; });
+    var ts = store('trf3_tipo');
+    document.querySelectorAll('#tipos input').forEach(function(r){ if(ts && r.value === ts) r.checked = true; r.addEventListener('change', atualizaDisp); });
+    var box = $('chips');
+    TEMAS.forEach(function(t){
+      var lab = document.createElement('label'); lab.className = 'chip';
+      var cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = t;
+      cb.checked = salvos ? salvos.indexOf(t) !== -1 : true;
+      cb.addEventListener('change', atualizaDisp);
+      var sp = document.createElement('span'); sp.textContent = t;
+      var n = document.createElement('span'); n.className = 'n'; n.textContent = cont[t];
+      lab.appendChild(cb); lab.appendChild(sp); lab.appendChild(n); box.appendChild(lab);
+    });
+    atualizaDisp();
+  }
+
+  function iniciar(cards){
+    deck = cards; i = 0; marks = {}; escolhas = {};
+    $('setup').classList.add('hidden'); $('fim').classList.add('hidden'); $('study').classList.remove('hidden');
+    mostra();
+  }
+  function sortear(){
+    var p = pool(); if(!p.length) return;
+    var v = $('qtd').value === 'all' ? p.length : parseInt($('qtd').value, 10);
+    if(!(v > 0)) v = 20;
+    v = Math.min(v, p.length); $('qtd').value = v;
+    store('trf3_qtd', String(v));
+    iniciar(shuffle(p.slice()).slice(0, v));
+  }
+
+  function mostra(){
+    var q = deck[i]; if(!q) return;
+    $('card').classList.remove('flipped');
+    $('tagF').textContent = q.lei; $('tagB').textContent = q.lei;
+    $('pergunta').textContent = q.p;
+    var mc = !!q.alts;
+    $('card').classList.toggle('mc', mc);
+    $('alts').classList.toggle('hidden', !mc); $('mcBack').classList.toggle('hidden', !mc);
+    $('resposta').classList.toggle('hidden', mc);
+    document.querySelector('.actions .mid').style.visibility = mc ? 'hidden' : 'visible';
+    if (mc) montaMC(q); else { $('resposta').textContent = q.r; $('footL').textContent = 'Pergunta'; $('footR').textContent = 'Toque para ver a resposta'; }
+    $('qid').textContent = '#' + q.id;
+    $('pos').textContent = 'Cartão ' + (i+1) + ' de ' + deck.length;
+    $('prev').disabled = i === 0;
+    $('next').textContent = i === deck.length-1 ? 'Concluir' : 'Próximo →';
+    placar();
+  }
+  function montaMC(q){
+    var box = $('alts'); box.innerHTML = ''; box.classList.remove('feito');
+    q.alts.forEach(function(a, k){
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'alt';
+      var l = document.createElement('b'); l.textContent = '(' + LET[k] + ')';
+      var t = document.createElement('span'); t.textContent = a.t;
+      b.appendChild(l); b.appendChild(t);
+      b.addEventListener('click', function(e){ e.stopPropagation(); if (escolhas[q.id] !== undefined) virar(); else responder(k); });
+      box.appendChild(b);
+    });
+    var back = $('mcBack'); back.innerHTML = '';
+    var en = document.createElement('div'); en.className = 'enun'; en.textContent = q.p; back.appendChild(en);
+    var ver = document.createElement('div'); ver.className = 'veredito'; ver.id = 'veredito'; back.appendChild(ver);
+    var ul = document.createElement('ul'); ul.className = 'coment';
+    q.alts.forEach(function(a, k){
+      var li = document.createElement('li'); if (k === q.ok) li.className = 'ok';
+      var h = document.createElement('strong'); h.textContent = '(' + LET[k] + ') ' + (k === q.ok ? '✓ ' : '');
+      var tx = document.createElement('span'); tx.textContent = a.t;
+      var c = document.createElement('span'); c.className = 't'; c.textContent = a.c;
+      li.appendChild(h); li.appendChild(tx); li.appendChild(c); ul.appendChild(li);
+    });
+    back.appendChild(ul);
+    pintaMC(q);
+  }
+  function pintaMC(q){
+    var esc = escolhas[q.id], feito = esc !== undefined;
+    var btns = $('alts').querySelectorAll('.alt');
+    btns.forEach(function(b, k){
+      b.classList.toggle('certa', feito && k === q.ok);
+      b.classList.toggle('errada', feito && k === esc && esc !== q.ok);
+      b.disabled = false;
+    });
+    $('alts').classList.toggle('feito', feito);
+    var v = $('veredito');
+    if (!feito){ v.className = 'veredito'; v.textContent = 'Gabarito: (' + LET[q.ok] + ') — você ainda não respondeu.'; }
+    else if (esc === q.ok){ v.className = 'veredito o'; v.textContent = 'Você acertou: (' + LET[q.ok] + ').'; }
+    else { v.className = 'veredito x'; v.textContent = 'Você marcou (' + LET[esc] + '). Gabarito: (' + LET[q.ok] + ').'; }
+    $('footL').textContent = feito ? (esc === q.ok ? 'Acertou' : 'Errou') : 'Escolha uma alternativa';
+    $('footR').textContent = feito ? 'Toque no cartão para ver os comentários' : 'ou toque para ver o gabarito';
+  }
+  function responder(k){
+    var q = deck[i]; if (!q || !q.alts || escolhas[q.id] !== undefined) return;
+    escolhas[q.id] = k; marks[q.id] = (k === q.ok); placar(); pintaMC(q);
+  }
+  function placar(){
+    var o=0,x=0; Object.keys(marks).forEach(function(k){ if(marks[k]) o++; else x++; });
+    $('ok').textContent = o; $('bad').textContent = x;
+    $('prog').style.width = (deck.length ? (Object.keys(marks).length/deck.length*100) : 0) + '%';
+    return [o,x];
+  }
+  function virar(){ $('card').classList.toggle('flipped'); }
+  function avancar(){ if(i < deck.length-1){ i++; mostra(); } else fim(); }
+  function marcar(acerto){ marks[deck[i].id] = acerto; placar(); avancar(); }
+
+  function fim(){
+    var s = placar(), resp = s[0]+s[1];
+    $('study').classList.add('hidden'); $('fim').classList.remove('hidden');
+    $('pct').textContent = resp ? Math.round(s[0]/resp*100) + '%' : '–';
+    $('resumo').textContent = s[0] + ' acertos, ' + s[1] + ' erros' + (deck.length-resp ? ', ' + (deck.length-resp) + ' sem marcação' : '') + ' em ' + deck.length + ' cartões.';
+    $('revisar').disabled = s[1] === 0;
+  }
+  function voltarSetup(){ $('study').classList.add('hidden'); $('fim').classList.add('hidden'); $('setup').classList.remove('hidden'); }
+
+  function ligar(){
+    $('total').textContent = BANCO.length;
+    var q = parseInt(store('trf3_qtd'), 10); if(q > 0) $('qtd').value = q;
+    montaChips();
+    document.querySelectorAll('.quick button').forEach(function(b){
+      b.addEventListener('click', function(){ $('qtd').value = b.dataset.q === 'all' ? pool().length : b.dataset.q; });
+    });
+    $('sortear').addEventListener('click', sortear);
+    $('qtd').addEventListener('keydown', function(e){ if(e.key === 'Enter') sortear(); });
+    $('todos').addEventListener('click', function(){ document.querySelectorAll('#chips input').forEach(function(c){ c.checked = true; }); atualizaDisp(); });
+    $('nenhum').addEventListener('click', function(){ document.querySelectorAll('#chips input').forEach(function(c){ c.checked = false; }); atualizaDisp(); });
+    $('card').addEventListener('click', virar);
+    $('prev').addEventListener('click', function(){ if(i>0){ i--; mostra(); } });
+    $('next').addEventListener('click', avancar);
+    $('acertei').addEventListener('click', function(){ marcar(true); });
+    $('errei').addEventListener('click', function(){ marcar(false); });
+    $('novo').addEventListener('click', voltarSetup);
+    $('novo2').addEventListener('click', voltarSetup);
+    $('refazer').addEventListener('click', function(){ iniciar(shuffle(deck.slice())); });
+    $('revisar').addEventListener('click', function(){
+      var erradas = deck.filter(function(q){ return marks[q.id] === false; });
+      if(erradas.length) iniciar(shuffle(erradas));
+    });
+    document.addEventListener('keydown', function(e){
+      if($('study').classList.contains('hidden')) return;
+      if(e.target && e.target.tagName === 'INPUT') return;
+      if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); virar(); }
+      else if(e.key === 'ArrowRight') avancar();
+      else if(e.key === 'ArrowLeft'){ if(i>0){ i--; mostra(); } }
+      else if(deck[i] && deck[i].alts){ var k = 'abcde'.indexOf(String(e.key).toLowerCase()); if(k !== -1 && e.key.length === 1) responder(k); }
+      else if(e.key === '1') marcar(false);
+      else if(e.key === '2') marcar(true);
+    });
+  }
+
+  function carregar(){
+    if (Array.isArray(window.QUESTOES)){ BANCO = window.QUESTOES; ligar(); return; }
+    fetch('questoes.json').then(function(r){ return r.json(); }).then(function(d){ BANCO = d; ligar(); })
+      .catch(function(){ $('disp').innerHTML = '<span class="err">Não foi possível carregar questoes.js. Deixe o arquivo na mesma pasta desta página.</span>'; });
+  }
+  carregar();
+})();
+</script>
+</body>
+</html>
